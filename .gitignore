@@ -1,0 +1,57 @@
+# Python cache/bytecode
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Virtual environment
+venv/
+.env/
+.env.bak/
+.venv/
+
+# IDE / Editor configs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment variables / secrets
+*.env
+.env.local
+.env.*.local
+
+# Testing / coverage
+.coverage
+.coverage.*
+htmlcov/
+.cache/
+pytest_cache/
+nosetests.xml
+coverage.xml
+
+# Logs
+*.log
+logs/
+*.out
+
+# Build / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# FastAPI specific (optional)
+# Uvicorn can create reload cache dirs
+.reload/
+
+# PyCharm project settings
+*.iml
+
+client_secret.json
+token.json
