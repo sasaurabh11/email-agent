@@ -1,6 +1,7 @@
-from fastapi import APIRouter, HTTPException
-from app.services.llm_client import summarize_text
+from fastapi import APIRouter, HTTPException, Query, Body
+from app.services.llm_client import summarize_text, generate_draft
 from app.core.mongo import emails_collection
+from app.models.email_model import DraftRequest
 
 router = APIRouter()
 
@@ -31,7 +32,6 @@ async def summarize_email(email_id: str, user_id: str, mode: str = "short"):
 
 @router.post("/threads/{thread_id}/summarize")
 async def summarize_thread(thread_id: str, user_id: str, mode: str = "short"):
-    # Check if already summarized in any email of this thread
     existing = await emails_collection.find_one(
         {"thread_id": thread_id, "user_id": user_id, f"thread_summaries.{mode}": {"$exists": True}},
         projection={f"thread_summaries.{mode}": 1}
@@ -62,3 +62,11 @@ async def summarize_thread(thread_id: str, user_id: str, mode: str = "short"):
     )
 
     return {"thread_id": thread_id, "mode": mode, "summary": summary}
+
+@router.post("/drafts/generate")
+async def generate_draft_email(
+    user_id: str = Query(...), 
+    draft: DraftRequest = Body(...) 
+):
+    draft_text = await generate_draft(draft.recipient, draft.subject, draft.context)
+    return {"draft": draft_text}

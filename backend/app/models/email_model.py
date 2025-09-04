@@ -12,3 +12,8 @@ class Email(BaseModel):
     body: Optional[str]
     date: datetime
     labels: List[str] = []
+
+class DraftRequest(BaseModel):
+    recipient: str
+    subject: str
+    context: str = ""
