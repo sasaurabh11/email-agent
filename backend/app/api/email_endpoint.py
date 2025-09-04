@@ -21,7 +21,6 @@ router = APIRouter()
 # ---------------------- Helpers ---------------------- #
 
 def parse_email(msg_data: dict) -> dict:
-    """Parse Gmail API message into structured format"""
     payload = msg_data.get("payload", {})
     headers = payload.get("headers", [])
 
@@ -61,7 +60,6 @@ def parse_email(msg_data: dict) -> dict:
 
 @router.get("/auth/google")
 def google_auth():
-    """Step 1: Redirect user to Google OAuth"""
     flow = Flow.from_client_secrets_file(
         CLIENT_SECRETS_FILE,
         scopes=SCOPES,
@@ -77,7 +75,6 @@ def google_auth():
 
 @router.get("/auth/callback")
 def google_callback(code: str):
-    """Step 2: Handle Google OAuth callback"""
     flow = Flow.from_client_secrets_file(
         CLIENT_SECRETS_FILE,
         scopes=SCOPES,
@@ -95,7 +92,6 @@ def google_callback(code: str):
 
 @router.get("/mails/fetch")
 async def fetch_emails(user_id: str):
-    """Step 3: Fetch emails from Gmail API and store in MongoDB"""
     if not os.path.exists("token.json"):
         return JSONResponse(content={"error": "No token found. Please authenticate first."}, status_code=401)
 
@@ -122,9 +118,8 @@ async def fetch_emails(user_id: str):
     return {"status": "success", "emails": stored_emails}
 
 
-@router.get("/emails")
+@router.get("/mails")
 async def get_emails(user_id: str):
-    """Step 4: Retrieve stored emails from MongoDB"""
     emails_cursor = emails_collection.find({"user_id": user_id}).sort("date", -1)
     emails = await emails_cursor.to_list(length=50)
     return {"emails": emails}

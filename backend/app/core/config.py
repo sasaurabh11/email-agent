@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     )
     
     # AI Providers
-    OPENAI_API_KEY: str = ""
+    GEMINI_API_KEY: str = ""
     NEBIUS_API_KEY: str = ""
     
     # Vector Database

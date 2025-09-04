@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.api import email_endpoint
+from app.api import email_endpoint, summarise_endpoint
 from app.core import mongo 
 
 app = FastAPI(title=settings.PROJECT_NAME, version=settings.VERSION)
@@ -17,6 +17,7 @@ app.add_middleware(
 
 # routers
 app.include_router(email_endpoint.router, prefix="/emails", tags=["emails"])
+app.include_router(summarise_endpoint.router, prefix="/summarize", tags=["summaries"])
 
 @app.on_event("startup")
 async def startup_db_client():
