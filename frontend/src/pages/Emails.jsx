@@ -3,7 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { useEmail } from "../context/EmailContext";
 import EmailList from "../components/emails/EmailList";
 import EmailDetail from "../components/emails/EmailDetail";
-import FilterPanel from '../components/filtering/FilterPanel';
+import FilterPanel from "../components/filtering/FilterPanel";
 import SummaryPanel from "../components/summarization/SummaryPanel";
 // import EmailFilters from '../components/emails/EmailFilters';
 import { RefreshCw, Filter, Download } from "lucide-react";
@@ -20,10 +20,12 @@ const Emails = () => {
     selectedEmail,
     fetchEmail,
     filterAllEmails,
+    generateReplyDraft,
   } = useEmail();
   const [selectedEmailId, setSelectedEmailId] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [replyDraft, setReplyDraft] = useState("");
 
   useEffect(() => {
     if (user) {
@@ -42,8 +44,8 @@ const Emails = () => {
 
     try {
       setLoading(true);
-      await mailAPI.fetchEmails(user.id);
-      await fetchEmails(user.id);
+      sessionStorage.removeItem("emails_synced");
+      await fetchEmails(user.id, true);
     } catch (error) {
       console.error("Failed to refresh emails:", error);
     } finally {
@@ -68,6 +70,20 @@ const Emails = () => {
       </div>
     );
   }
+
+  const handleReply = async (email) => {
+    if (!user || !email) return;
+
+    const draftReq = {
+      recipient: email.sender,
+      subject: `Re: ${email.subject || ""}`,
+      context: "Respond politely and clearly",
+      reply_to: email.plain_body || email.html_body || email.snippet,
+    };
+
+    const draft = await generateReplyDraft(user.id, draftReq);
+    setReplyDraft(draft);
+  };
 
   return (
     <div className="flex flex-col h-full">
@@ -123,11 +139,35 @@ const Emails = () => {
 
           <div className="lg:col-span-2 space-y-6">
             <div className="bg-white rounded-lg shadow overflow-hidden">
-              <EmailDetail email={selectedEmail} />
+              <EmailDetail email={selectedEmail} onReply={handleReply} />
             </div>
           </div>
         </div>
       </div>
+
+      {replyDraft && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+          <div className="bg-white p-6 rounded shadow-lg w-2/3">
+            <h2 className="text-xl font-semibold mb-4">AI Draft Reply</h2>
+            <textarea
+              className="w-full border rounded p-2 h-60"
+              value={replyDraft}
+              onChange={(e) => setReplyDraft(e.target.value)}
+            />
+            <div className="mt-4 flex justify-end space-x-2">
+              <button
+                onClick={() => setReplyDraft("")}
+                className="px-4 py-2 bg-gray-300 rounded"
+              >
+                Cancel
+              </button>
+              <button className="px-4 py-2 bg-blue-500 text-white rounded">
+                Send
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

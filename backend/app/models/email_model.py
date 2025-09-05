@@ -17,3 +17,4 @@ class DraftRequest(BaseModel):
     recipient: str
     subject: str
     context: str = ""
+    reply_to: str = ""

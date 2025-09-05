@@ -1,12 +1,11 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.api import email_endpoint, summarise_endpoint, filtering_endpoint
+from app.api import email_endpoint, summarise_endpoint, filtering_endpoint, email_composition_endpoint, search_rag_endpoint
 from app.core import mongo 
 
 app = FastAPI(title=settings.PROJECT_NAME, version=settings.VERSION)
 
-# CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.BACKEND_CORS_ORIGINS,
@@ -19,6 +18,8 @@ app.add_middleware(
 app.include_router(email_endpoint.router, prefix="/emails", tags=["emails"])
 app.include_router(summarise_endpoint.router, prefix="/summarize", tags=["summaries"])
 app.include_router(filtering_endpoint.router, prefix="/filtering", tags=["filtering"])
+app.include_router(email_composition_endpoint.router, prefix="/personalized", tags=["personalized"])
+app.include_router(search_rag_endpoint.router, prefix="/search", tags=["search"])
 
 @app.on_event("startup")
 async def startup_db_client():

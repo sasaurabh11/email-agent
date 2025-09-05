@@ -44,6 +44,9 @@ export const mailAPI = {
     api.post(`/filtering/emails/filter-all`, null, {
       params: { user_id: userId },
     }),
+
+  generateReplyDraft: (userId, draftReq) =>
+    api.post(`/personalized/drafts/reply?user_id=${userId}`, draftReq),
 };
 
 export default api;

@@ -1,8 +1,13 @@
 import os
+import json
 import google.generativeai as genai
 from app.core.config import settings
+from app.services.rag_system import RAGSystem
+from app.core.mongo import emails_collection
+from typing import Dict, Any
 
 genai.configure(api_key=settings.GEMINI_API_KEY)
+rag = RAGSystem()
 
 gemini_model = genai.GenerativeModel("gemini-1.5-flash")
 
@@ -80,3 +85,131 @@ async def classify_email(text: str) -> str:
             return category
     
     return "PERSONAL"
+
+
+async def analyze_writing_style(text: str) -> str:
+    prompt = f"""
+    Analyze the following emails and describe the user's writing style
+    (tone, formality, vocabulary, sentence structure, politeness, etc).
+    Provide a short profile of their style:
+
+    {text}
+    """
+    response = await gemini_model.generate_content_async(prompt)
+    return response.text.strip()
+
+async def generate_personalized_email(
+    profile: str,
+    recipient: str,
+    subject: str,
+    context: str,
+    reply_to: str = ""
+) -> str:
+    if reply_to:
+        prompt = f"""
+        You are replying to the following email:
+        ---
+        {reply_to}
+        ---
+
+        Write a reply email to {recipient}.
+        Subject: {subject}
+        Context (instructions from user): {context}
+
+        Write in the following style profile:
+        {profile}
+        """
+    else:
+        prompt = f"""
+        Write an email to {recipient}.
+        Subject: {subject}
+        Context: {context}
+
+        Write in the following style profile:
+        {profile}
+        """
+
+    response = await gemini_model.generate_content_async(prompt)
+    return response.text.strip()
+
+
+async def index_user_emails(user_id: str):
+    cursor = emails_collection.find({"user_id": user_id})
+    count = 0
+    async for e in cursor:
+        body = e.get("body") or e.get("snippet") or ""
+        if not body:
+            continue
+        meta = {
+            "email_id": e["id"],
+            "thread_id": e.get("thread_id"),
+            "user_id": user_id,
+            "subject": e.get("subject", ""),
+            "sender": e.get("sender", ""),
+            "date": str(e.get("date"))
+        }
+        count += rag.add_document(doc_id=e["id"], text=body, metadata=meta)
+    return {"status": "indexed", "chunks": count}
+
+async def semantic_search(user_id: str, query: str, top_k: int = 5) -> Dict[str, Any]:
+    results = rag.search(query, n_results=top_k)
+    if not results:
+        return {
+            "answer": "No relevant results found.",
+            "sources": [],
+            "raw_matches": []
+        }
+
+    context_text = "\n\n".join(
+        [f"From: {r['metadata'].get('sender')}\nSubject: {r['metadata'].get('subject')}\n{r['content']}"
+         for r in results]
+    )
+    prompt = f"""
+You are an assistant helping the user search their emails.
+
+User query: {query}
+
+Relevant email excerpts:
+{context_text}
+
+Task:
+- Provide a clear, concise answer (3-5 sentences).
+- Then list the most relevant sources with subject, sender, and a one-line excerpt.
+Return JSON with keys: answer, sources.
+"""
+    resp = gemini_model.generate_content(prompt)
+
+    import json
+    try:
+        parsed = json.loads(resp.text)
+        answer = parsed.get("answer", resp.text)
+        sources = parsed.get("sources", [])
+    except Exception:
+        answer = resp.text
+        sources = [
+            {
+                "email_id": r["metadata"].get("email_id"),
+                "subject": r["metadata"].get("subject"),
+                "sender": r["metadata"].get("sender"),
+                "excerpt": r["content"][:120],
+                "score": r["score"]
+            } for r in results
+        ]
+
+    raw_matches = [
+        {
+            "email_id": r["metadata"].get("email_id"),
+            "thread_id": r["metadata"].get("thread_id"),
+            "subject": r["metadata"].get("subject"),
+            "sender": r["metadata"].get("sender"),
+            "date": r["metadata"].get("date"),
+            "excerpt": r["content"][:200], 
+            "score": r["score"]
+        } for r in results
+    ]
+
+    return {
+        "answer": answer,
+        "sources": sources,
+        "raw_matches": raw_matches
+    }

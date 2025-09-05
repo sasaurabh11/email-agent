@@ -12,21 +12,47 @@ export const EmailProvider = ({ children }) => {
   const [threadSummaries, setThreadSummaries] = useState({});
   const [draft, setDraft] = useState("");
 
-  const fetchEmails = useCallback(async (userId) => {
-    if (!userId) return;
-    setLoading(true);
-    try {
-      await mailAPI.fetchEmails(userId);
-      const res = await mailAPI.getEmails(userId);
-      const fetched = res.data?.emails || [];
-      setEmails(fetched);
-      setFilteredEmails(fetched);
-    } catch (err) {
-      console.error("Failed to fetch emails:", err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const fetchEmails = useCallback(
+    async (userId, force = false) => {
+      if (!userId) return;
+
+      if (emails.length > 0 && !force) {
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const alreadyFetched = sessionStorage.getItem("emails_synced");
+
+        if (!alreadyFetched || force) {
+          await mailAPI.fetchEmails(userId);
+          sessionStorage.setItem("emails_synced", "true");
+        }
+
+        if (emails.length === 0 || force) {
+          const res = await mailAPI.getEmails(userId);
+          const response = res.data;
+
+          if (response.emails && Array.isArray(response.emails)) {
+            const sortedEmails = response.emails.sort(
+              (a, b) => new Date(b.date) - new Date(a.date)
+            );
+            setEmails(sortedEmails);
+            setFilteredEmails(sortedEmails);
+          } else {
+            console.warn("Invalid email response format:", response);
+            setEmails([]);
+            setFilteredEmails([]);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch emails:", err);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [emails]
+  );
 
   const fetchEmail = useCallback(
     async (emailId, userId) => {
@@ -43,6 +69,19 @@ export const EmailProvider = ({ children }) => {
     },
     [emails]
   );
+
+  const generateReplyDraft = useCallback(async (userId, draftReq) => {
+    setLoading(true);
+    try {
+      const res = await mailAPI.generateReplyDraft(userId, draftReq);
+      return res.data.draft;
+    } catch (err) {
+      console.error("Failed to generate reply draft:", err);
+      return "";
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   const filterAllEmails = useCallback(
     async (userId) => {
@@ -185,7 +224,8 @@ export const EmailProvider = ({ children }) => {
         summarizeThread,
         generateDraftEmail,
         filterEmail,
-        filterCompleteEmails
+        filterCompleteEmails,
+        generateReplyDraft
       }}
     >
       {children}

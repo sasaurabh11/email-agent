@@ -24,10 +24,6 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: str = ""
     NEBIUS_API_KEY: str = ""
     
-    # Vector Database
-    WEAVIATE_URL: str = "http://localhost:8080"
-    QDRANT_URL: str = "http://localhost:6333"
-    
     # Email Providers
     GOOGLE_CLIENT_ID: str = ""
     GOOGLE_CLIENT_SECRET: str = ""
