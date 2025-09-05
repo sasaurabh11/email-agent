@@ -4,7 +4,7 @@ from datetime import datetime
 from email import message_from_bytes
 
 from fastapi import APIRouter
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from google_auth_oauthlib.flow import Flow
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
@@ -83,11 +83,11 @@ def google_callback(code: str):
     flow.fetch_token(code=code)
     credentials = flow.credentials
 
-    # Save credentials to file
     with open("token.json", "w") as f:
         f.write(credentials.to_json())
 
-    return {"message": "Authentication successful. Now you can call /emails/fetch"}
+    frontend_url = f"{settings.FRONTEND_URL}/auth/callback?code={code}"
+    return RedirectResponse(url=frontend_url)
 
 
 @router.get("/mails/fetch")

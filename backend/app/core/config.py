@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     
     # CORS
     BACKEND_CORS_ORIGINS: List[str] = Field(
-        default=["http://localhost:3000", "http://127.0.0.1:3000"],
+        default=["http://localhost:5173", "http://127.0.0.1:5173"],
         alias="CORS_ORIGIN"
     )
     
@@ -34,6 +34,7 @@ class Settings(BaseSettings):
 
     CLIENT_SECRETS_FILE: str = Field(default="client_secret.json", alias="CLIENT_FILE")
     GMAILSCOPES: List[str] = ["https://www.googleapis.com/auth/gmail.readonly"]
+    FRONTEND_URL: str = "http://localhost:5173"
     REDIRECT_URL: str = "http://localhost:8000/emails/auth/callback"
     
     class Config:
