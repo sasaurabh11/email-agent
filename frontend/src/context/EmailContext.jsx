@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from "react";
-import { emailAPI } from "../services/api";
+import { mailAPI } from "../services/api";
 
 const EmailContext = createContext();
 
@@ -8,13 +8,16 @@ export const EmailProvider = ({ children }) => {
   const [filteredEmails, setFilteredEmails] = useState([]);
   const [selectedEmail, setSelectedEmail] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [summaries, setSummaries] = useState({});
+  const [threadSummaries, setThreadSummaries] = useState({});
+  const [draft, setDraft] = useState("");
 
   const fetchEmails = useCallback(async (userId) => {
     if (!userId) return;
     setLoading(true);
     try {
-      await emailAPI.fetchEmails(userId);
-      const res = await emailAPI.getEmails(userId);
+      await mailAPI.fetchEmails(userId);
+      const res = await mailAPI.getEmails(userId);
       const fetched = res.data?.emails || [];
       setEmails(fetched);
       setFilteredEmails(fetched);
@@ -46,7 +49,7 @@ export const EmailProvider = ({ children }) => {
       if (!userId) return;
       setLoading(true);
       try {
-        await emailAPI.filterAllEmails(userId);
+        await mailAPI.filterAllEmails(userId);
         await fetchEmails(userId);
       } catch (err) {
         console.error("Failed to filter all emails:", err);
@@ -56,6 +59,62 @@ export const EmailProvider = ({ children }) => {
     },
     [fetchEmails]
   );
+
+  const summarizeEmail = useCallback(
+    async (emailId, userId, mode = "short") => {
+      setLoading(true);
+      try {
+        const res = await mailAPI.summarizeEmail(emailId, userId, mode);
+        const data = res.data;
+        setSummaries((prev) => ({
+          ...prev,
+          [emailId]: { ...(prev[emailId] || {}), [mode]: data.summary },
+        }));
+        return data.summary;
+      } catch (err) {
+        console.error("Failed to summarize email:", err);
+        return null;
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
+
+  const summarizeThread = useCallback(
+    async (threadId, userId, mode = "short") => {
+      setLoading(true);
+      try {
+        const res = await mailAPI.summarizeThread(threadId, userId, mode);
+        const data = res.data;
+        setThreadSummaries((prev) => ({
+          ...prev,
+          [threadId]: { ...(prev[threadId] || {}), [mode]: data.summary },
+        }));
+        return data.summary;
+      } catch (err) {
+        console.error("Failed to summarize thread:", err);
+        return null;
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
+
+  const generateDraftEmail = useCallback(async (userId, draftReq) => {
+    setLoading(true);
+    try {
+      const res = await mailAPI.generateDraft(userId, draftReq);
+      setDraft(res.data.draft);
+      return res.data.draft;
+    } catch (err) {
+      console.error("Failed to generate draft:", err);
+      return "";
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   return (
     <EmailContext.Provider
@@ -68,6 +127,12 @@ export const EmailProvider = ({ children }) => {
         fetchEmail,
         filterAllEmails,
         setFilteredEmails,
+        summaries,
+        threadSummaries,
+        draft,
+        summarizeEmail,
+        summarizeThread,
+        generateDraftEmail,
       }}
     >
       {children}

@@ -1,22 +1,29 @@
-import React, { useEffect, useState } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { useEmail } from '../context/EmailContext';
-import EmailList from '../components/emails/EmailList';
-import EmailDetail from '../components/emails/EmailDetail';
-// import FilterPanel from '../components/filtering/FilterPanel';
-// import SummaryPanel from '../components/summarization/SummaryPanel';
+import React, { useEffect, useState } from "react";
+import { useAuth } from "../context/AuthContext";
+import { useEmail } from "../context/EmailContext";
+import EmailList from "../components/emails/EmailList";
+import EmailDetail from "../components/emails/EmailDetail";
+import FilterPanel from '../components/filtering/FilterPanel';
+import SummaryPanel from "../components/summarization/SummaryPanel";
 // import EmailFilters from '../components/emails/EmailFilters';
-import { RefreshCw, Filter, Download } from 'lucide-react';
-import Button from '../components/ui/Button';
-import LoadingSpinner from '../components/ui/LoadingSpinner';
-import { emailAPI } from '../services/api';
+import { RefreshCw, Filter, Download } from "lucide-react";
+import Button from "../components/ui/Button";
+import LoadingSpinner from "../components/ui/LoadingSpinner";
+import { mailAPI } from "../services/api";
 
 const Emails = () => {
   const { user } = useAuth();
-  const { emails, filteredEmails, fetchEmails, selectedEmail, fetchEmail, filterAllEmails } = useEmail();
+  const {
+    emails,
+    filteredEmails,
+    fetchEmails,
+    selectedEmail,
+    fetchEmail,
+    filterAllEmails,
+  } = useEmail();
   const [selectedEmailId, setSelectedEmailId] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -32,13 +39,13 @@ const Emails = () => {
 
   const handleRefresh = async () => {
     if (!user) return;
-    
+
     try {
       setLoading(true);
-      await emailAPI.fetchEmails(user.id);
+      await mailAPI.fetchEmails(user.id);
       await fetchEmails(user.id);
     } catch (error) {
-      console.error('Failed to refresh emails:', error);
+      console.error("Failed to refresh emails:", error);
     } finally {
       setLoading(false);
     }
@@ -46,11 +53,11 @@ const Emails = () => {
 
   const handleFilterAll = async () => {
     if (!user) return;
-    
+
     try {
       await filterAllEmails(user.id);
     } catch (error) {
-      console.error('Failed to filter all emails:', error);
+      console.error("Failed to filter all emails:", error);
     }
   };
 
@@ -75,19 +82,11 @@ const Emails = () => {
             <Filter className="w-4 h-4 mr-2" />
             Filters
           </Button>
-          <Button
-            onClick={handleFilterAll}
-            variant="outline"
-            size="sm"
-          >
+          <Button onClick={handleFilterAll} variant="outline" size="sm">
             <Filter className="w-4 h-4 mr-2" />
             Filter All
           </Button>
-          <Button
-            onClick={handleRefresh}
-            variant="outline"
-            size="sm"
-          >
+          <Button onClick={handleRefresh} variant="outline" size="sm">
             <RefreshCw className="w-4 h-4 mr-2" />
             Refresh
           </Button>
@@ -114,17 +113,19 @@ const Emails = () => {
           </div>
         </div>
 
-        <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <EmailDetail email={selectedEmail} />
-          </div>
-          
+        <div className="flex flex-col">
           {selectedEmail && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* <FilterPanel email={selectedEmail} /> */}
-              {/* <SummaryPanel email={selectedEmail} /> */}
+              <FilterPanel email={selectedEmail} />
+              <SummaryPanel email={selectedEmail} />
             </div>
           )}
+
+          <div className="lg:col-span-2 space-y-6">
+            <div className="bg-white rounded-lg shadow overflow-hidden">
+              <EmailDetail email={selectedEmail} />
+            </div>
+          </div>
         </div>
       </div>
     </div>

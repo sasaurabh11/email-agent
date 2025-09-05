@@ -1,6 +1,6 @@
 import React from 'react';
-import { useEmail } from '../../contexts/EmailContext';
-import { useAuth } from '../../contexts/AuthContext';
+import { useEmail } from '../../context/EmailContext';
+import { useAuth } from '../../context/AuthContext';
 import { Filter, Sparkles } from 'lucide-react';
 import Button from '../ui/Button';
 

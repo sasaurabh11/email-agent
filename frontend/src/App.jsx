@@ -11,8 +11,8 @@ import Login from './pages/Login';
 import Callback from "./pages/Callback";
 import Dashboard from './pages/Dashboard';
 import Emails from './pages/Emails';
-// import Summaries from './pages/Summaries';
-// import Settings from './pages/Settings';
+import Summaries from './pages/Summaries';
+import Settings from './pages/Settings';
 import "./index.css";
 
 const ProtectedRoute = ({ children }) => {
@@ -62,7 +62,7 @@ function App() {
                     </ProtectedRoute>
                   }
                 />
-                {/* <Route
+                <Route
                   path="/summaries"
                   element={
                     <ProtectedRoute>
@@ -77,7 +77,7 @@ function App() {
                       <Settings />
                     </ProtectedRoute>
                   }
-                /> */}
+                />
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </Layout>

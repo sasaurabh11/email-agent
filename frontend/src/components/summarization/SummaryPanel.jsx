@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useEmail } from '../../contexts/EmailContext';
-import { useAuth } from '../../contexts/AuthContext';
+import { useEmail } from '../../context/EmailContext';
+import { useAuth } from '../../context/AuthContext';
 import { FileText, Sparkles, Copy } from 'lucide-react';
 import Button from '../ui/Button';
 
@@ -14,7 +14,6 @@ const SummaryPanel = ({ email }) => {
   const handleSummarize = async () => {
     setIsLoading(true);
     try {
-      // Check if we already have a summary for this mode
       const cachedSummary = summaries[email.id]?.[selectedMode];
       if (cachedSummary) {
         setSummary(cachedSummary);

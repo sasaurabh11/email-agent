@@ -17,52 +17,21 @@ export const authAPI = {
 export const mailAPI = {
   fetchEmails: (userId) => api.get("/emails/mails/fetch", { params: { user_id: userId } }),
   getEmails: (userId) => api.get("/emails/mails", { params: { user_id: userId } }),
-};
 
-// Request interceptor to add auth token
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("auth_token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+  summarizeEmail: (emailId, userId, mode = "short") =>
+    api.post(`/summarize/emails/${emailId}/summarize`, null, {
+      params: { user_id: userId, mode },
+    }),
 
-// Response interceptor to handle errors
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem("auth_token");
-      localStorage.removeItem("user_data");
-      window.location.href = "/login";
-    }
-    return Promise.reject(error);
-  }
-);
+  summarizeThread: (threadId, userId, mode = "short") =>
+    api.post(`/summarize/threads/${threadId}/summarize`, null, {
+      params: { user_id: userId, mode },
+    }),
 
-export const emailAPI = {
-  getEmails: (userId) => api.get(`/emails/mails?user_id=${userId}`),
-  fetchEmails: (userId) => api.get(`/emails/mails/fetch?user_id=${userId}`),
-  filterEmail: (emailId, userId) =>
-    api.post(`/filtering/emails/${emailId}/filter?user_id=${userId}`),
-  filterAllEmails: (userId) =>
-    api.post(`/filtering/emails/filter-all?user_id=${userId}`),
-  summarizeEmail: (emailId, userId, mode) =>
-    api.post(
-      `/summarize/emails/${emailId}/summarize?user_id=${userId}&mode=${mode}`
-    ),
-  summarizeThread: (threadId, userId, mode) =>
-    api.post(
-      `/summarize/threads/${threadId}/summarize?user_id=${userId}&mode=${mode}`
-    ),
-  generateDraft: (userId, draftData) =>
-    api.post(`/summarize/drafts/generate?user_id=${userId}`, draftData),
+  generateDraft: (userId, draft) =>
+    api.post(`/summarize/drafts/generate`, draft, {
+      params: { user_id: userId },
+    }),
 };
 
 export default api;
