@@ -2,7 +2,6 @@ import React from "react";
 import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { EmailProvider } from "./context/EmailContext";
-// import Notification from "./components/ui/Notification";
 import Layout from "./components/layout/Layout";
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
@@ -14,6 +13,7 @@ import Emails from './pages/Emails';
 import Summaries from './pages/Summaries';
 import Settings from './pages/Settings';
 import "./index.css";
+import FilteredEmailsPage from "./pages/FilteredEmails";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -67,6 +67,14 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <Summaries />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/filter"
+                  element={
+                    <ProtectedRoute>
+                      <FilteredEmailsPage />
                     </ProtectedRoute>
                   }
                 />

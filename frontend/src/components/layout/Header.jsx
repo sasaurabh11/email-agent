@@ -18,9 +18,7 @@ const Header = ({ onToggleSidebar, isSidebarOpen }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const navigation = [
-    { name: 'Emails', href: '/emails', icon: Mail },
-    { name: 'Dashboard', href: '/', icon: BarChart3 },
-    { name: 'Settings', href: '/settings', icon: Settings },
+
   ];
 
   const isActive = (path) => location.pathname === path;

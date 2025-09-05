@@ -15,8 +15,10 @@ export const authAPI = {
 };
 
 export const mailAPI = {
-  fetchEmails: (userId) => api.get("/emails/mails/fetch", { params: { user_id: userId } }),
-  getEmails: (userId) => api.get("/emails/mails", { params: { user_id: userId } }),
+  fetchEmails: (userId) =>
+    api.get("/emails/mails/fetch", { params: { user_id: userId } }),
+  getEmails: (userId) =>
+    api.get("/emails/mails", { params: { user_id: userId } }),
 
   summarizeEmail: (emailId, userId, mode = "short") =>
     api.post(`/summarize/emails/${emailId}/summarize`, null, {
@@ -30,6 +32,16 @@ export const mailAPI = {
 
   generateDraft: (userId, draft) =>
     api.post(`/summarize/drafts/generate`, draft, {
+      params: { user_id: userId },
+    }),
+
+  filterEmail: (emailId, userId) =>
+    api.post(`/filtering/emails/${emailId}/filter`, null, {
+      params: { user_id: userId },
+    }),
+
+  filterAllEmails: (userId) =>
+    api.post(`/filtering/emails/filter-all`, null, {
       params: { user_id: userId },
     }),
 };

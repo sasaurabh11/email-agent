@@ -16,6 +16,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     { name: 'Dashboard', href: '/', icon: BarChart3 },
     { name: 'Emails', href: '/emails', icon: Mail },
     { name: 'Summaries', href: '/summaries', icon: FileText },
+    { name: 'Filter', href: '/filter', icon: FileText },
     { name: 'Settings', href: '/settings', icon: Settings },
   ];
 

@@ -116,6 +116,57 @@ export const EmailProvider = ({ children }) => {
     }
   }, []);
 
+  const filterEmail = useCallback(async (emailId, userId) => {
+    setLoading(true);
+    try {
+      const res = await mailAPI.filterEmail(emailId, userId);
+      const { classification } = res.data;
+
+      // update local state
+      setEmails((prev) =>
+        prev.map((e) => (e.id === emailId ? { ...e, classification } : e))
+      );
+      setFilteredEmails((prev) =>
+        prev.map((e) => (e.id === emailId ? { ...e, classification } : e))
+      );
+
+      return classification;
+    } catch (err) {
+      console.error("Failed to filter email:", err);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const filterCompleteEmails = useCallback(async (userId) => {
+    setLoading(true);
+    try {
+      const res = await mailAPI.filterAllEmails(userId);
+      const classified = res.data?.classified_emails || [];
+
+      setEmails((prev) =>
+        prev.map((e) => {
+          const found = classified.find((c) => c.id === e.id);
+          return found ? { ...e, classification: found.classification } : e;
+        })
+      );
+      setFilteredEmails((prev) =>
+        prev.map((e) => {
+          const found = classified.find((c) => c.id === e.id);
+          return found ? { ...e, classification: found.classification } : e;
+        })
+      );
+
+      return classified;
+    } catch (err) {
+      console.error("Failed to filter all emails:", err);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   return (
     <EmailContext.Provider
       value={{
@@ -133,6 +184,8 @@ export const EmailProvider = ({ children }) => {
         summarizeEmail,
         summarizeThread,
         generateDraftEmail,
+        filterEmail,
+        filterCompleteEmails
       }}
     >
       {children}
