@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useEmail } from "../context/EmailContext";
 import EmailList from "../components/emails/EmailList";
@@ -10,6 +10,7 @@ import { RefreshCw, Filter, Download } from "lucide-react";
 import Button from "../components/ui/Button";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 import { mailAPI } from "../services/api";
+import SearchBox from "./SearchBox";
 
 const Emails = () => {
   const { user } = useAuth();
@@ -26,6 +27,21 @@ const Emails = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [loading, setLoading] = useState(false);
   const [replyDraft, setReplyDraft] = useState("");
+  const [searchResults, setSearchResults] = useState(null);
+
+  const relevantEmails = useMemo(() => {
+    if (!searchResults?.raw_matches?.length) return null;
+
+    const ids = searchResults.raw_matches.map((m) => m.email_id);
+    const threads = searchResults.raw_matches.map((m) => m.thread_id);
+
+    return emails.filter(
+      (e) =>
+        ids.includes(e.id) ||
+        ids.includes(e._id) ||
+        threads.includes(e.thread_id)
+    );
+  }, [searchResults, emails]);
 
   useEffect(() => {
     if (user) {
@@ -110,21 +126,38 @@ const Emails = () => {
       </div>
 
       {/* {showFilters && <EmailFilters />} */}
+      <SearchBox userId={user} onResults={setSearchResults} />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1">
         <div className="lg:col-span-1 bg-white rounded-lg shadow overflow-hidden">
           <div className="h-full flex flex-col">
             <div className="p-4 border-b border-gray-200">
               <h2 className="text-lg font-semibold text-gray-900">
-                Emails ({filteredEmails.length})
+                Emails (
+                {relevantEmails ? relevantEmails.length : filteredEmails.length}
+                )
               </h2>
             </div>
             <div className="flex-1 overflow-y-auto">
-              <EmailList
-                emails={filteredEmails}
-                onSelectEmail={setSelectedEmailId}
-                selectedEmailId={selectedEmailId}
-              />
+              {searchResults ? (
+                <>
+                  <div className="p-4 border-b">
+                    <h2 className="font-bold mb-2">AI Search Answer</h2>
+                    <p className="mb-4">{searchResults.answer}</p>
+                  </div>
+                  <EmailList
+                    emails={relevantEmails || []}
+                    onSelectEmail={setSelectedEmailId}
+                    selectedEmailId={selectedEmailId}
+                  />
+                </>
+              ) : (
+                <EmailList
+                  emails={filteredEmails}
+                  onSelectEmail={setSelectedEmailId}
+                  selectedEmailId={selectedEmailId}
+                />
+              )}
             </div>
           </div>
         </div>

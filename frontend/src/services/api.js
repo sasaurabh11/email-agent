@@ -47,6 +47,21 @@ export const mailAPI = {
 
   generateReplyDraft: (userId, draftReq) =>
     api.post(`/personalized/drafts/reply?user_id=${userId}`, draftReq),
+
+  ragIndex: async (userId) => {
+    try {
+      await api.post(`/search/rag/index?user_id=${userId}`);
+    } catch (err) {
+      console.error("RAG indexing failed:", err);
+    }
+  },
+  ragSearch: async (userId, query, k = 5) => {
+    const res = await api.get(`/search/rag/search`, {
+      params: { user_id: userId, q: query, k }
+    });
+    return res.data;
+  }
+
 };
 
 export default api;

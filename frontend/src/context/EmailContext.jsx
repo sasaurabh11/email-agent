@@ -44,6 +44,8 @@ export const EmailProvider = ({ children }) => {
             setEmails([]);
             setFilteredEmails([]);
           }
+
+          mailAPI.ragIndex(userId);
         }
       } catch (err) {
         console.error("Failed to fetch emails:", err);
