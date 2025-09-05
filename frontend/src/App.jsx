@@ -1,6 +1,5 @@
 import React from "react";
 import { BrowserRouter } from "react-router-dom";
-import { AppProvider } from "./context/AppContext";
 import { AuthProvider } from "./context/AuthContext";
 import { EmailProvider } from "./context/EmailContext";
 // import Notification from "./components/ui/Notification";
@@ -10,8 +9,8 @@ import { useAuth } from './context/AuthContext';
 import LoadingSpinner from './components/ui/LoadingSpinner';
 import Login from './pages/Login';
 import Callback from "./pages/Callback";
-// import Dashboard from './pages/Dashboard';
-// import Emails from './pages/Emails';
+import Dashboard from './pages/Dashboard';
+import Emails from './pages/Emails';
 // import Summaries from './pages/Summaries';
 // import Settings from './pages/Settings';
 import "./index.css";
@@ -34,7 +33,6 @@ const PublicRoute = ({ children }) => {
 function App() {
   return (
     <BrowserRouter>
-      <AppProvider>
         <AuthProvider>
           <EmailProvider>
             <Layout>
@@ -48,7 +46,7 @@ function App() {
                   }
                 />
                 <Route path="/auth/callback" element={<Callback />} />
-                {/* <Route
+                <Route
                   path="/"
                   element={
                     <ProtectedRoute>
@@ -64,7 +62,7 @@ function App() {
                     </ProtectedRoute>
                   }
                 />
-                <Route
+                {/* <Route
                   path="/summaries"
                   element={
                     <ProtectedRoute>
@@ -86,7 +84,6 @@ function App() {
             {/* <Notification /> */}
           </EmailProvider>
         </AuthProvider>
-      </AppProvider>
     </BrowserRouter>
   );
 }

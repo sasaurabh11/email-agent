@@ -9,13 +9,12 @@ const Callback = () => {
 
   useEffect(() => {
     const code = params.get("code");
-    console.log("code", code)
     if (code) {
       handleCallback(code).then(() => {
         navigate("/");
       });
     }
-  }, [params, handleCallback, navigate]);
+  }, []);
 
   return <div>Completing authentication...</div>;
 };

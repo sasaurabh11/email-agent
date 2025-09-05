@@ -1,50 +1,49 @@
-import React, { useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { useEmail } from '../contexts/EmailContext';
-import { useApp } from '../contexts/AppContext';
-import { Mail, Filter, FileText, Sparkles, RefreshCw } from 'lucide-react';
-import { Card, CardContent, CardHeader } from '../components/ui/Card';
-import Button from '../components/ui/Button';
-import LoadingSpinner from '../components/ui/LoadingSpinner';
+// pages/Dashboard.jsx
+import React, { useEffect } from "react";
+import { useAuth } from "../context/AuthContext";
+import { useEmail } from "../context/EmailContext";
+import { Mail, Filter, FileText, Sparkles, RefreshCw } from "lucide-react";
+import { Card, CardContent, CardHeader } from "../components/ui/Card";
+import Button from "../components/ui/Button";
+import LoadingSpinner from "../components/ui/LoadingSpinner";
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const { emails, fetchEmails } = useEmail();
-  const { loading } = useApp();
+  const { emails, fetchEmails, loading } = useEmail();
 
   useEffect(() => {
-    if (user) {
+    if (user?.id) {
       fetchEmails(user.id);
     }
   }, [user, fetchEmails]);
 
   const stats = [
     {
-      title: 'Total Emails',
+      title: "Total Emails",
       value: emails.length,
       icon: Mail,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-100',
+      color: "text-blue-600",
+      bgColor: "bg-blue-100",
     },
     {
-      title: 'Important Emails',
-      value: emails.filter(e => e.classification === 'important').length,
+      title: "Important Emails",
+      value: emails.filter((e) => e.classification === "important").length,
       icon: Filter,
-      color: 'text-red-600',
-      bgColor: 'bg-red-100',
+      color: "text-red-600",
+      bgColor: "bg-red-100",
     },
     {
-      title: 'Summarized',
-      value: emails.filter(e => e.summaries).length,
+      title: "Summarized",
+      value: emails.filter((e) => e.summaries).length,
       icon: FileText,
-      color: 'text-green-600',
-      bgColor: 'bg-green-100',
+      color: "text-green-600",
+      bgColor: "bg-green-100",
     },
   ];
 
   const recentEmails = emails.slice(0, 5);
 
-  if (loading && !emails.length) {
+  if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
         <LoadingSpinner size="lg" />
@@ -56,11 +55,7 @@ const Dashboard = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <Button
-          onClick={() => fetchEmails(user.id)}
-          variant="outline"
-          size="sm"
-        >
+        <Button onClick={() => fetchEmails(user.id)} variant="outline" size="sm">
           <RefreshCw className="w-4 h-4 mr-2" />
           Refresh
         </Button>
@@ -100,21 +95,24 @@ const Dashboard = () => {
             ) : (
               <div className="space-y-4">
                 {recentEmails.map((email) => (
-                  <div key={email.id} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+                  <div
+                    key={email.id}
+                    className="flex items-center justify-between p-3 border border-gray-200 rounded-lg"
+                  >
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900 truncate">
-                        {email.subject || '(No Subject)'}
+                        {email.subject || "(No Subject)"}
                       </p>
-                      <p className="text-sm text-gray-500 truncate">
-                        {email.sender}
-                      </p>
+                      <p className="text-sm text-gray-500 truncate">{email.sender}</p>
                     </div>
                     {email.classification && (
-                      <span className={`ml-2 px-2 py-1 text-xs font-medium rounded-full ${
-                        email.classification === 'important' 
-                          ? 'bg-red-100 text-red-800' 
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
+                      <span
+                        className={`ml-2 px-2 py-1 text-xs font-medium rounded-full ${
+                          email.classification === "important"
+                            ? "bg-red-100 text-red-800"
+                            : "bg-gray-100 text-gray-800"
+                        }`}
+                      >
                         {email.classification}
                       </span>
                     )}

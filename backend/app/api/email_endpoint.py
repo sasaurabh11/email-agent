@@ -122,4 +122,8 @@ async def fetch_emails(user_id: str):
 async def get_emails(user_id: str):
     emails_cursor = emails_collection.find({"user_id": user_id}).sort("date", -1)
     emails = await emails_cursor.to_list(length=50)
+
+    for email in emails:
+        email["_id"] = str(email["_id"])
+
     return {"emails": emails}

@@ -1,23 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { useEmail } from '../contexts/EmailContext';
+import { useAuth } from '../context/AuthContext';
+import { useEmail } from '../context/EmailContext';
 import EmailList from '../components/emails/EmailList';
 import EmailDetail from '../components/emails/EmailDetail';
-import FilterPanel from '../components/filtering/FilterPanel';
-import SummaryPanel from '../components/summarization/SummaryPanel';
-import EmailFilters from '../components/emails/EmailFilters';
+// import FilterPanel from '../components/filtering/FilterPanel';
+// import SummaryPanel from '../components/summarization/SummaryPanel';
+// import EmailFilters from '../components/emails/EmailFilters';
 import { RefreshCw, Filter, Download } from 'lucide-react';
 import Button from '../components/ui/Button';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
-import { useApp } from '../contexts/AppContext';
 import { emailAPI } from '../services/api';
 
 const Emails = () => {
   const { user } = useAuth();
   const { emails, filteredEmails, fetchEmails, selectedEmail, fetchEmail, filterAllEmails } = useEmail();
-  const { loading, setLoading } = useApp();
   const [selectedEmailId, setSelectedEmailId] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     if (user) {
@@ -95,7 +94,7 @@ const Emails = () => {
         </div>
       </div>
 
-      {showFilters && <EmailFilters />}
+      {/* {showFilters && <EmailFilters />} */}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1">
         <div className="lg:col-span-1 bg-white rounded-lg shadow overflow-hidden">
@@ -122,8 +121,8 @@ const Emails = () => {
           
           {selectedEmail && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FilterPanel email={selectedEmail} />
-              <SummaryPanel email={selectedEmail} />
+              {/* <FilterPanel email={selectedEmail} /> */}
+              {/* <SummaryPanel email={selectedEmail} /> */}
             </div>
           )}
         </div>

@@ -12,12 +12,11 @@ const api = axios.create({
 
 export const authAPI = {
   getAuthUrl: () => api.get("/emails/auth/google"),
-  exchangeCode: (code) => api.get("/emails/auth/callback", { params: { code } }),
 };
 
 export const mailAPI = {
-  fetchEmails: (userId) => api.get("/mails/fetch", { params: { user_id: userId } }),
-  getEmails: (userId) => api.get("/mails", { params: { user_id: userId } }),
+  fetchEmails: (userId) => api.get("/emails/mails/fetch", { params: { user_id: userId } }),
+  getEmails: (userId) => api.get("/emails/mails", { params: { user_id: userId } }),
 };
 
 // Request interceptor to add auth token

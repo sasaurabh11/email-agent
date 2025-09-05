@@ -54,11 +54,9 @@ export const AuthProvider = ({ children }) => {
 
   const handleCallback = async (code) => {
     try {
-      await authAPI.exchangeCode(code);
-
-      // Generate unique user id for this client
       const userId = uuidv4();
       localStorage.setItem("user_id", userId);
+      localStorage.setItem("auth_token", code || "dummy");
 
       dispatch({
         type: "SET_USER",
