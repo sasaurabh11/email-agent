@@ -11,7 +11,6 @@ async def reply_draft(
     user_id: str = Query(...),
     draft_req: DraftRequest = Body(...)
 ):
-    print(draft_req)
     profile = await build_user_profile(user_id)
 
     draft = await generate_personalized_email(
