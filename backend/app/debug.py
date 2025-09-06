@@ -18,37 +18,14 @@ from app.services.agent_react import run_agent_on_email
 
 # Test data based on your Snowflake email
 TEST_EMAIL = {
-    'id': '1991ac86cf800f0a',
-    'user_id': '12345',
-    'body': """Snowflake Berlin Software Engineer Coding Test (Intern) - powered by HackerRank
-
-Hi,
-
-Thank you for your interest in joining Snowflake! We're excited to invite you to the next step in the process: the HackerRank Snowflake Berlin Software Engineer Coding Test (Intern) assessment. This is a great opportunity to showcase your skills, and we're here to support you along the way.
-
-Here's what you need to know:
-- Timeline: Please complete the assessment within 7 calendar days, or as discussed with your recruiter.
-- Practice Makes Perfect: To help you feel confident, we've included a sample test where you can explore the HackerRank environment and practice before starting the official test.
-
-A few tips for success:
-- Create the Right Environment: Set up in a quiet, private space where you can focus.
-- Understand Each Question: Take a moment to carefully read each question before diving in.
-- Avoid Disruptions: Once you start, complete the test in one uninterrupted session. Avoid refreshing your browser or using the back button to prevent losing progress.
-
-Feel free to reach out to your recruiter if you have any questions.
-Wishing you the best of luck with the assessment—go show us your skills!
-
-Happy coding,
-The Snowflake Hiring Team
-
-Duration: 120 min
-End Login Date/Time: 20 Sep 2025 09:49 AM PDT
-
-Please note once you begin the test the timer will start and the test cannot be paused.""",
-    'subject': 'Your HackerRank Snowflake Berlin Software Engineer Coding Test (Intern) Invitation',
-    'sender': 'Snowflake Hiring Team <support@hackerrankforwork.com>',
+    'id': '19920077b6741e4d',
+    'user_id': '04a00301-111f-4cc8-bdef-4d0b5cf3ae8e',
+    'body': """Let’s meet tomorrow at 5pm to discuss project progress. 
+Attendees: khatarnakpaji12@gmail.com""",
+    'subject': 'Meeting Request: Project Progress',
+    'sender': 'khatarnakpaji12@gmail.com',
     'date': datetime.now(),
-    'labels': ['IMPORTANT', 'CATEGORY_UPDATES', 'INBOX']
+    'labels': ['INBOX', 'MEETING_REQUEST']
 }
 
 async def debug_individual_tools():

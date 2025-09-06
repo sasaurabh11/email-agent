@@ -3,7 +3,9 @@ from datetime import datetime, timedelta
 from app.services.llm_client import summarize_text, classify_email, generate_personalized_email
 from app.core.mongo import emails_collection
 from app.services.email_composition import build_user_profile
+from app.services.meeting_scheduling import sched_service
 import nest_asyncio
+import re
 
 nest_asyncio.apply()
 
@@ -84,15 +86,36 @@ def sync_draft_tool(input_str: str):
     except Exception as e:
         return f"Error generating draft: {str(e)}"
 
+def extract_email(sender: str) -> str:
+    match = re.search(r'<(.+?)>', sender)
+    if match:
+        return match.group(1)
+    return sender.strip()
 
-def sync_schedule_tool(details: str):
+def sync_schedule_tool(input_str: str):
     try:
-        if not details or not details.strip():
-            return "Error: No meeting details provided"
-        
-        details = details.strip()
-        return f"Meeting scheduled via Cal.com: {details}"
-        
+        parts = input_str.split("|")
+        if len(parts) < 3:
+            return "Error: Invalid input format. Expected: user_id|email_id|meeting_details|[target_user_email]"
+
+        user_id, email_id, details = parts[:3]
+        target_user_email = parts[3].strip() if len(parts) > 3 else ""
+
+        if not target_user_email:
+            target_user_email = "unknown@example.com"
+
+        target_user_email = extract_email(target_user_email)
+
+        async def schedule_coro():
+            return await sched_service.schedule_meeting_from_email(
+                user_id=user_id,
+                email_id=email_id,
+                details=details,
+                target_user_email=target_user_email
+            )
+
+        return run_sync(schedule_coro())
+
     except Exception as e:
         return f"Error scheduling meeting: {str(e)}"
 
