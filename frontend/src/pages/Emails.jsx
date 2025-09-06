@@ -9,8 +9,9 @@ import SummaryPanel from "../components/summarization/SummaryPanel";
 import { RefreshCw, Filter, Download } from "lucide-react";
 import Button from "../components/ui/Button";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
-import { mailAPI } from "../services/api";
+import { agentAPI, mailAPI } from "../services/api";
 import SearchBox from "./SearchBox";
+import AgentModal from "./AgentModal";
 
 const Emails = () => {
   const { user } = useAuth();
@@ -22,12 +23,29 @@ const Emails = () => {
     fetchEmail,
     filterAllEmails,
     generateReplyDraft,
+    setSelectedEmail
   } = useEmail();
   const [selectedEmailId, setSelectedEmailId] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
   const [loading, setLoading] = useState(false);
   const [replyDraft, setReplyDraft] = useState("");
   const [searchResults, setSearchResults] = useState(null);
+  const [agentOpen, setAgentOpen] = useState(false);
+  const [agentData, setAgentData] = useState(null);
+
+  const runAgent = async (emailId) => {
+    setAgentOpen(true);
+    setAgentData(null); 
+
+    try {
+      const data = await agentAPI.callAgent(emailId, user);
+      console.log("data", data)
+      setAgentData(data.result); 
+    } catch (err) {
+      console.error("Agent run failed", err);
+      setAgentData(["❌ Failed to run agent"]);
+    }
+  };
 
   const relevantEmails = useMemo(() => {
     if (!searchResults?.raw_matches?.length) return null;
@@ -101,6 +119,12 @@ const Emails = () => {
     setReplyDraft(draft);
   };
 
+  const handleSelectEmail = (email) => {
+    setSelectedEmailId(email.id);
+    setSelectedEmail(email);
+    runAgent(email); 
+  };
+
   return (
     <div className="flex flex-col h-full">
       <div className="flex justify-between items-center mb-6">
@@ -147,14 +171,14 @@ const Emails = () => {
                   </div>
                   <EmailList
                     emails={relevantEmails || []}
-                    onSelectEmail={setSelectedEmailId}
+                    onSelectEmail={handleSelectEmail}
                     selectedEmailId={selectedEmailId}
                   />
                 </>
               ) : (
                 <EmailList
                   emails={filteredEmails}
-                  onSelectEmail={setSelectedEmailId}
+                  onSelectEmail={handleSelectEmail}
                   selectedEmailId={selectedEmailId}
                 />
               )}
@@ -177,6 +201,12 @@ const Emails = () => {
           </div>
         </div>
       </div>
+
+      <AgentModal
+        isOpen={agentOpen}
+        onClose={() => setAgentOpen(false)}
+        agentData={agentData}
+      />
 
       {replyDraft && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">

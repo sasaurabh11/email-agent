@@ -19,7 +19,7 @@ def extract_email(sender: str) -> str:
     return sender.strip()
 
 gemini_model = ChatGoogleGenerativeAI(
-    model="gemini-1.5-flash",
+    model="gemma-3-27b-it",
     api_key=settings.GEMINI_API_KEY,
     temperature=0,
 )

@@ -64,4 +64,15 @@ export const mailAPI = {
 
 };
 
+export const  agentAPI = {
+  callAgent: async (emailId, user) => {
+    try {
+      const res = await api.post(`/think/agent/run/${emailId}?user_id=${user.id}`)
+      return res.data;
+    } catch (error) {
+      console.error("agent error:", err);
+    }
+  }
+}
+
 export default api;

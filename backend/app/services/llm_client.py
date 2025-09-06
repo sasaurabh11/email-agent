@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 genai.configure(api_key=settings.GEMINI_API_KEY)
 rag = RAGSystem()
 
-gemini_model = genai.GenerativeModel("gemini-1.5-flash")
+gemini_model = genai.GenerativeModel("gemma-3-27b-it")
 
 async def summarize_text(text: str, mode: str = "short") -> str:
     prompt = f"""

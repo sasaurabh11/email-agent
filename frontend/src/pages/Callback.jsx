@@ -8,7 +8,7 @@ const Callback = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const code = params.get("code");
+    const code = params.get("user_id");
     if (code) {
       handleCallback(code).then(() => {
         navigate("/");

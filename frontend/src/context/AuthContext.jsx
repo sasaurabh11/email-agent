@@ -55,7 +55,7 @@ export const AuthProvider = ({ children }) => {
   const handleCallback = async (code) => {
     try {
       const userId = uuidv4();
-      localStorage.setItem("user_id", userId);
+      localStorage.setItem("user_id", code);
       localStorage.setItem("auth_token", code || "dummy");
 
       dispatch({

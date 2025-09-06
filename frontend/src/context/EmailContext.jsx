@@ -227,7 +227,8 @@ export const EmailProvider = ({ children }) => {
         generateDraftEmail,
         filterEmail,
         filterCompleteEmails,
-        generateReplyDraft
+        generateReplyDraft,
+        setSelectedEmail
       }}
     >
       {children}
