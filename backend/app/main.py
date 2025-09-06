@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.api import email_endpoint, summarise_endpoint, filtering_endpoint, email_composition_endpoint, search_rag_endpoint, agent_endpoint
+from app.api import email_endpoint, summarise_endpoint, filtering_endpoint, email_composition_endpoint, search_rag_endpoint, agent_endpoint, schedule
 from app.core import mongo 
 
 app = FastAPI(title=settings.PROJECT_NAME, version=settings.VERSION)
@@ -21,6 +21,7 @@ app.include_router(filtering_endpoint.router, prefix="/filtering", tags=["filter
 app.include_router(email_composition_endpoint.router, prefix="/personalized", tags=["personalized"])
 app.include_router(search_rag_endpoint.router, prefix="/search", tags=["search"])
 app.include_router(agent_endpoint.router, prefix="/think", tags=["agent"])
+app.include_router(schedule.router, prefix="/schedule", tags=["schedule"])
 
 @app.on_event("startup")
 async def startup_db_client():

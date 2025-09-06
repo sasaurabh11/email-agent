@@ -29,10 +29,18 @@ class Settings(BaseSettings):
     GOOGLE_CLIENT_SECRET: str = ""
 
     CLIENT_SECRETS_FILE: str = Field(default="client_secret.json", alias="CLIENT_FILE")
-    GMAILSCOPES: List[str] = ["https://www.googleapis.com/auth/gmail.readonly"]
+    GMAILSCOPES: List[str] = [
+        "https://www.googleapis.com/auth/gmail.readonly",
+        "https://www.googleapis.com/auth/calendar.events",
+        "https://www.googleapis.com/auth/userinfo.email",
+        "https://www.googleapis.com/auth/userinfo.profile",
+        "openid"
+    ]
     FRONTEND_URL: str = "http://localhost:5173"
     REDIRECT_URL: str = "http://localhost:8000/emails/auth/callback"
     
+
+    CAL_COM_API_KEY: str = ""
     class Config:
         env_file = ".env"
         populate_by_name = True

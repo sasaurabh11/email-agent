@@ -1,16 +1,19 @@
 import os
+import json
 import base64
+import uuid
 from datetime import datetime
 from email import message_from_bytes
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse, RedirectResponse
 from google_auth_oauthlib.flow import Flow
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
+from google.auth.transport.requests import Request
 
 from app.core.config import settings
-from app.core.mongo import emails_collection
+from app.core.mongo import emails_collection, users_collection
 from typing import Dict, List, Optional
 
 CLIENT_SECRETS_FILE = settings.CLIENT_SECRETS_FILE
@@ -120,7 +123,7 @@ def google_auth():
 
 
 @router.get("/auth/callback")
-def google_callback(code: str):
+async def google_callback(code: str):
     flow = Flow.from_client_secrets_file(
         CLIENT_SECRETS_FILE,
         scopes=SCOPES,
@@ -129,29 +132,76 @@ def google_callback(code: str):
     flow.fetch_token(code=code)
     credentials = flow.credentials
 
-    with open("token.json", "w") as f:
-        f.write(credentials.to_json())
+    service = build("oauth2", "v2", credentials=credentials)
+    user_info = service.userinfo().get().execute()
 
-    frontend_url = f"{settings.FRONTEND_URL}/auth/callback?code={code}"
+    email = user_info.get("email")
+    name = user_info.get("name", email.split("@")[0])
+
+    user_doc = await users_collection.find_one({"email": email})
+
+    if user_doc:
+        user_id = user_doc["id"]
+        await users_collection.update_one(
+            {"id": user_id},
+            {"$set": {"google_credentials": credentials.to_json(),
+                      "updated_at": datetime.utcnow()}}
+        )
+    else:
+        user_id = str(uuid.uuid4())
+        user_doc = {
+            "id": user_id,
+            "name": name,
+            "email": email,
+            "google_credentials": credentials.to_json(),
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow(),
+        }
+        await users_collection.insert_one(user_doc)
+
+    frontend_url = f"{settings.FRONTEND_URL}/auth/callback?user_id={user_id}"
     return RedirectResponse(url=frontend_url)
 
 
 @router.get("/mails/fetch")
 async def fetch_emails(user_id: str):
-    if not os.path.exists("token.json"):
-        return JSONResponse(content={"error": "No token found. Please authenticate first."}, status_code=401)
+    user_doc = await users_collection.find_one({"id": user_id})
+    if not user_doc or "google_credentials" not in user_doc:
+        raise HTTPException(status_code=401, detail="User not authenticated with Google")
 
-    creds = Credentials.from_authorized_user_file("token.json", SCOPES)
+    creds = Credentials.from_authorized_user_info(
+        json.loads(user_doc["google_credentials"]), SCOPES
+    )
+
+    if not creds.valid and creds.refresh_token:
+        try:
+            creds.refresh(Request())
+            await users_collection.update_one(
+                {"id": user_id},
+                {"$set": {
+                    "google_credentials": creds.to_json(),
+                    "updated_at": datetime.utcnow()
+                }}
+            )
+        except Exception as e:
+            raise HTTPException(status_code=401, detail=f"Failed to refresh token: {e}")
+
     service = build("gmail", "v1", credentials=creds)
 
-    results = service.users().messages().list(userId="me", maxResults=20).execute()
-    messages = results.get("messages", [])
+    try:
+        results = service.users().messages().list(userId="me", maxResults=20).execute()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Gmail API error: {e}")
 
+    messages = results.get("messages", [])
     stored_emails = []
+
     for msg in messages:
         try:
-            msg_data = service.users().messages().get(userId="me", id=msg["id"], format='full').execute()
-            
+            msg_data = service.users().messages().get(
+                userId="me", id=msg["id"], format="full"
+            ).execute()
+
             email_doc = parse_email(msg_data)
             email_doc["user_id"] = user_id
 
@@ -161,7 +211,6 @@ async def fetch_emails(user_id: str):
                 upsert=True,
             )
             stored_emails.append(email_doc)
-            
         except Exception as e:
             print(f"Error processing message {msg['id']}: {e}")
             continue

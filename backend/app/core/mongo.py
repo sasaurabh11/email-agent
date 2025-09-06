@@ -6,3 +6,4 @@ MONGO_URL = settings.DATABASE_URL
 client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_URL)
 db = client["email_assistant"]
 emails_collection = db["emails"]
+users_collection = db["users"]

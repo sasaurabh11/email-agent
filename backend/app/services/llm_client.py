@@ -5,6 +5,7 @@ from app.core.config import settings
 from app.services.rag_system import RAGSystem
 from app.core.mongo import emails_collection
 from typing import Dict, Any
+from datetime import datetime, timedelta
 
 genai.configure(api_key=settings.GEMINI_API_KEY)
 rag = RAGSystem()
@@ -213,3 +214,62 @@ Return JSON with keys: answer, sources.
         "sources": sources,
         "raw_matches": raw_matches
     }
+
+async def extract_meeting_details(details: str) -> Dict[str, Any]:
+        now = datetime.utcnow()
+        now_str = now.strftime("%Y-%m-%d %H:%M:%S UTC")
+        prompt = f"""
+        You are an assistant that extracts meeting scheduling details from email text.
+
+        Current date and time: {now_str}
+
+        Email content:
+        {details}
+
+        Instructions:
+        - Always interpret relative dates like "today", "tomorrow", "next Monday"
+        based on the current date and time provided above.
+        - Use ISO 8601 format for times (YYYY-MM-DDTHH:MM:SS).
+        - The year must always be {now.year} or later (never in the past).
+
+        Please return ONLY a valid JSON object with these fields:
+        - title: short meeting title (string)
+        - description: brief description (string)
+        - start_time: start time in ISO 8601 format
+        - end_time: end time in ISO 8601 format
+        - attendees: list of email addresses
+        """
+
+        try:
+            response = await gemini_model.generate_content_async(prompt)
+
+            cleaned = response.text.strip().strip("```json").strip("```")
+
+            data = json.loads(cleaned)
+
+            start = datetime.fromisoformat(data.get("start_time", now.isoformat()))
+            end = datetime.fromisoformat(data.get("end_time", (now + timedelta(hours=1)).isoformat()))
+
+            if start < now:
+                start = now + timedelta(hours=1)
+            if end <= start:
+                end = start + timedelta(hours=1)
+
+            return {
+                "title": data.get("title", "Meeting"),
+                "description": data.get("description", details[:200]),
+                "start_time": data.get("start_time", datetime.utcnow().isoformat()),
+                "end_time": data.get("end_time", (datetime.utcnow() + timedelta(hours=1)).isoformat()),
+                "attendees": data.get("attendees", []),
+            }
+
+        except Exception as e:
+            print(f"Gemini extraction failed: {e}")
+            return {
+                "title": "Meeting",
+                "description": details[:200],
+                "start_time": datetime.utcnow().isoformat(),
+                "end_time": (datetime.utcnow() + timedelta(hours=1)).isoformat(),
+                "attendees": [],
+            }
+
