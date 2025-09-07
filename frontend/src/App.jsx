@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { EmailProvider } from "./context/EmailContext";
@@ -11,9 +11,8 @@ import Callback from "./pages/Callback";
 import Dashboard from './pages/Dashboard';
 import Emails from './pages/Emails';
 import Summaries from './pages/Summaries';
-import Settings from './pages/Settings';
-import "./index.css";
 import FilteredEmailsPage from "./pages/FilteredEmails";
+import "./index.css";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -28,7 +27,6 @@ const PublicRoute = ({ children }) => {
   if (loading) return <LoadingSpinner />;
   return !isAuthenticated ? children : <Navigate to="/" />;
 };
-
 
 function App() {
   return (
@@ -78,18 +76,9 @@ function App() {
                     </ProtectedRoute>
                   }
                 />
-                <Route
-                  path="/settings"
-                  element={
-                    <ProtectedRoute>
-                      <Settings />
-                    </ProtectedRoute>
-                  }
-                />
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </Layout>
-            {/* <Notification /> */}
           </EmailProvider>
         </AuthProvider>
     </BrowserRouter>

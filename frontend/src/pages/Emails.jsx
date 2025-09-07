@@ -5,11 +5,16 @@ import EmailList from "../components/emails/EmailList";
 import EmailDetail from "../components/emails/EmailDetail";
 import FilterPanel from "../components/filtering/FilterPanel";
 import SummaryPanel from "../components/summarization/SummaryPanel";
-// import EmailFilters from '../components/emails/EmailFilters';
-import { RefreshCw, Filter, Download } from "lucide-react";
+import EmailFilters from "../components/emails/EmailFilters";
+import {
+  RefreshCw,
+  Filter,
+  Zap,
+  LayoutGrid,
+  LayoutList,
+} from "lucide-react";
 import Button from "../components/ui/Button";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
-import { agentAPI, mailAPI } from "../services/api";
 import SearchBox from "./SearchBox";
 import AgentModal from "./AgentModal";
 
@@ -23,8 +28,9 @@ const Emails = () => {
     fetchEmail,
     filterAllEmails,
     generateReplyDraft,
-    setSelectedEmail
+    setSelectedEmail,
   } = useEmail();
+
   const [selectedEmailId, setSelectedEmailId] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -32,15 +38,14 @@ const Emails = () => {
   const [searchResults, setSearchResults] = useState(null);
   const [agentOpen, setAgentOpen] = useState(false);
   const [agentData, setAgentData] = useState(null);
+  const [layout, setLayout] = useState("split"); // 'split' or 'list'
 
-  const runAgent = async (emailId) => {
+  const runAgent = async (email) => {
     setAgentOpen(true);
-    setAgentData(null); 
-
+    setAgentData(null);
     try {
-      const data = await agentAPI.callAgent(emailId, user);
-      console.log("data", data)
-      setAgentData(data.result); 
+      // const data = await agentAPI.callAgent(email.id, user);
+      // setAgentData(data.result);
     } catch (err) {
       console.error("Agent run failed", err);
       setAgentData(["❌ Failed to run agent"]);
@@ -49,39 +54,30 @@ const Emails = () => {
 
   const relevantEmails = useMemo(() => {
     if (!searchResults?.raw_matches?.length) return null;
-
     const ids = searchResults.raw_matches.map((m) => m.email_id);
     const threads = searchResults.raw_matches.map((m) => m.thread_id);
 
     return emails.filter(
-      (e) =>
-        ids.includes(e.id) ||
-        ids.includes(e._id) ||
-        threads.includes(e.thread_id)
+      (e) => ids.includes(e.id) || ids.includes(e._id) || threads.includes(e.thread_id)
     );
   }, [searchResults, emails]);
 
   useEffect(() => {
-    if (user) {
-      fetchEmails(user.id);
-    }
+    if (user) fetchEmails(user.id);
   }, [user, fetchEmails]);
 
   useEffect(() => {
-    if (selectedEmailId) {
-      fetchEmail(selectedEmailId, user.id);
-    }
+    if (selectedEmailId) fetchEmail(selectedEmailId, user.id);
   }, [selectedEmailId, user, fetchEmail]);
 
   const handleRefresh = async () => {
     if (!user) return;
-
     try {
       setLoading(true);
       sessionStorage.removeItem("emails_synced");
       await fetchEmails(user.id, true);
-    } catch (error) {
-      console.error("Failed to refresh emails:", error);
+    } catch (err) {
+      console.error("Failed to refresh emails:", err);
     } finally {
       setLoading(false);
     }
@@ -89,13 +85,33 @@ const Emails = () => {
 
   const handleFilterAll = async () => {
     if (!user) return;
-
     try {
       await filterAllEmails(user.id);
-    } catch (error) {
-      console.error("Failed to filter all emails:", error);
+    } catch (err) {
+      console.error("Failed to filter all emails:", err);
     }
   };
+
+  const handleReply = async (email) => {
+    if (!user || !email) return;
+    const draftReq = {
+      recipient: email.sender,
+      subject: `Re: ${email.subject || ""}`,
+      context: "Respond politely and clearly",
+      reply_to: email.plain_body || email.html_body || email.snippet,
+    };
+    const draft = await generateReplyDraft(user.id, draftReq);
+    setReplyDraft(draft);
+  };
+
+  const handleSelectEmail = (email) => {
+    setSelectedEmailId(email.id);
+    setSelectedEmail(email);
+    runAgent(email);
+  };
+
+  const toggleLayout = () =>
+    setLayout(layout === "split" ? "list" : "split");
 
   if (loading && !emails.length) {
     return (
@@ -105,128 +121,144 @@ const Emails = () => {
     );
   }
 
-  const handleReply = async (email) => {
-    if (!user || !email) return;
-
-    const draftReq = {
-      recipient: email.sender,
-      subject: `Re: ${email.subject || ""}`,
-      context: "Respond politely and clearly",
-      reply_to: email.plain_body || email.html_body || email.snippet,
-    };
-
-    const draft = await generateReplyDraft(user.id, draftReq);
-    setReplyDraft(draft);
-  };
-
-  const handleSelectEmail = (email) => {
-    setSelectedEmailId(email.id);
-    setSelectedEmail(email);
-    runAgent(email); 
-  };
-
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Email Inbox</h1>
+    <div className="flex flex-col min-h-screen space-y-6">
+      {/* Header */}
+      <div className="flex justify-between items-center p-4 border-b border-gray-800 bg-gray-900">
+        <div>
+          <h1 className="text-2xl font-bold text-white">Inbox</h1>
+          <p className="text-gray-400 text-sm">
+            Manage and organize your emails with AI
+          </p>
+        </div>
         <div className="flex space-x-2">
-          <Button
-            onClick={() => setShowFilters(!showFilters)}
-            variant="outline"
-            size="sm"
-          >
-            <Filter className="w-4 h-4 mr-2" />
-            Filters
+          <Button onClick={() => setShowFilters(!showFilters)} size="sm" variant="outline">
+            <Filter className="w-4 h-4 mr-1" />
+            {showFilters ? "Hide Filters" : "Show Filters"}
           </Button>
-          <Button onClick={handleFilterAll} variant="outline" size="sm">
-            <Filter className="w-4 h-4 mr-2" />
-            Filter All
+          <Button onClick={toggleLayout} size="sm" variant="outline">
+            {layout === "split" ? (
+              <LayoutList className="w-4 h-4 mr-1" />
+            ) : (
+              <LayoutGrid className="w-4 h-4 mr-1" />
+            )}
+            {layout === "split" ? "List View" : "Split View"}
           </Button>
-          <Button onClick={handleRefresh} variant="outline" size="sm">
-            <RefreshCw className="w-4 h-4 mr-2" />
-            Refresh
+          <Button onClick={handleFilterAll} size="sm" variant="outline">
+            <Zap className="w-4 h-4 mr-1" /> Filter All
+          </Button>
+          <Button onClick={handleRefresh} size="sm" variant="outline">
+            <RefreshCw className="w-4 h-4 mr-1" /> Refresh
           </Button>
         </div>
       </div>
 
-      {/* {showFilters && <EmailFilters />} */}
-      <SearchBox userId={user} onResults={setSearchResults} />
+      {/* Filters */}
+      {showFilters && (
+        <div className="p-4 border-b border-gray-800 bg-gray-900">
+          <EmailFilters />
+        </div>
+      )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1">
-        <div className="lg:col-span-1 bg-white rounded-lg shadow overflow-hidden">
-          <div className="h-full flex flex-col">
-            <div className="p-4 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-900">
-                Emails (
-                {relevantEmails ? relevantEmails.length : filteredEmails.length}
-                )
-              </h2>
-            </div>
-            <div className="flex-1 overflow-y-auto">
-              {searchResults ? (
-                <>
-                  <div className="p-4 border-b">
-                    <h2 className="font-bold mb-2">AI Search Answer</h2>
-                    <p className="mb-4">{searchResults.answer}</p>
-                  </div>
-                  <EmailList
-                    emails={relevantEmails || []}
-                    onSelectEmail={handleSelectEmail}
-                    selectedEmailId={selectedEmailId}
-                  />
-                </>
-              ) : (
+      {/* Search */}
+      <div className="p-4 border-b border-gray-800 bg-gray-900">
+        <SearchBox userId={user} onResults={setSearchResults} />
+      </div>
+
+      {/* Main Layout */}
+      <div className={`grid gap-6 overflow-hidden ${layout === "split" ? "xl:grid-cols-3" : "grid-cols-1"}`}>
+        {/* Email List */}
+        <div className={`bg-gray-900 border border-gray-800 rounded-xl ${layout === "split" ? "xl:col-span-1" : ""}`}>
+          <div className="p-3 border-b border-gray-800 flex justify-between items-center">
+            <h2 className="text-white font-semibold">
+              Emails ({relevantEmails ? relevantEmails.length : filteredEmails.length})
+            </h2>
+            {searchResults && (
+              <Button
+                onClick={() => setSearchResults(null)}
+                variant="ghost"
+                size="sm"
+                className="text-gray-400 hover:text-white"
+              >
+                Clear
+              </Button>
+            )}
+          </div>
+          <div className="flex-1 overflow-y-auto max-h-[calc(300vh-22rem)] scrollbar-hide">
+            {searchResults ? (
+              <>
+                <div className="p-3 border-b border-gray-800">
+                  <h2 className="font-bold text-white mb-1">AI Answer</h2>
+                  <p className="text-gray-300 text-sm">{searchResults.answer}</p>
+                </div>
                 <EmailList
-                  emails={filteredEmails}
+                  emails={relevantEmails || []}
                   onSelectEmail={handleSelectEmail}
                   selectedEmailId={selectedEmailId}
                 />
-              )}
-            </div>
+              </>
+            ) : (
+              <EmailList
+                emails={filteredEmails}
+                onSelectEmail={handleSelectEmail}
+                selectedEmailId={selectedEmailId}
+              />
+            )}
           </div>
         </div>
 
-        <div className="flex flex-col">
-          {selectedEmail && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FilterPanel email={selectedEmail} />
-              <SummaryPanel email={selectedEmail} />
-            </div>
-          )}
-
-          <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white rounded-lg shadow overflow-hidden">
-              <EmailDetail email={selectedEmail} onReply={handleReply} />
-            </div>
+        {/* Email Detail */}
+        {(layout === "split" || selectedEmail) && (
+          <div className={`bg-gray-900 border border-gray-800 rounded-xl ${layout === "split" ? "xl:col-span-2" : ""}`}>
+            {selectedEmail ? (
+              <div className="flex flex-col">
+                {/* AI Panels */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border-b border-gray-700">
+                  <FilterPanel email={selectedEmail} />
+                  <SummaryPanel email={selectedEmail} />
+                </div>
+                {/* Email Detail grows with content */}
+                <div className="p-4">
+                  <EmailDetail email={selectedEmail} onReply={handleReply} />
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center p-8 text-gray-400">
+                <p>Select an email to view details</p>
+              </div>
+            )}
           </div>
-        </div>
+        )}
       </div>
 
+      {/* Agent Modal */}
       <AgentModal
         isOpen={agentOpen}
         onClose={() => setAgentOpen(false)}
         agentData={agentData}
       />
 
+      {/* Reply Draft */}
       {replyDraft && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-          <div className="bg-white p-6 rounded shadow-lg w-2/3">
-            <h2 className="text-xl font-semibold mb-4">AI Draft Reply</h2>
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800 border border-gray-700 rounded-xl shadow-2xl p-6 w-full max-w-2xl">
+            <h2 className="text-xl font-semibold text-white mb-4">AI Draft Reply</h2>
             <textarea
-              className="w-full border rounded p-2 h-60"
+              className="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-4 h-60 focus:ring-2 focus:ring-indigo-500"
               value={replyDraft}
               onChange={(e) => setReplyDraft(e.target.value)}
             />
-            <div className="mt-4 flex justify-end space-x-2">
-              <button
+            <div className="mt-4 flex justify-end space-x-3">
+              <Button
                 onClick={() => setReplyDraft("")}
-                className="px-4 py-2 bg-gray-300 rounded"
+                variant="outline"
+                className="border-gray-600 hover:bg-gray-700"
               >
                 Cancel
-              </button>
-              <button className="px-4 py-2 bg-blue-500 text-white rounded">
-                Send
-              </button>
+              </Button>
+              <Button className="bg-indigo-600 hover:bg-indigo-700">
+                Send Reply
+              </Button>
             </div>
           </div>
         </div>

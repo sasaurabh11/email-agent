@@ -11,7 +11,7 @@ const EmailList = ({ emails, onSelectEmail, selectedEmailId }) => {
   }
 
   return (
-    <div className="divide-y divide-gray-200">
+    <div className="divide-y divide-gray-700">
       {emails.map((email) => (
         <EmailItem
           key={email.id}

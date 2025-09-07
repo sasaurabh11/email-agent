@@ -172,6 +172,14 @@ Steps:
 4. If you need more info from user, respond in this format:
    <<REQUEST_INFO: your question here>>
 
+IMPORTANT INSTRUCTIONS FOR MEETING SCHEDULING:
+- If the email is requesting to schedule a meeting:
+  * If specific time and details are provided in the email, use the schedule_meeting tool immediately with those details. DO NOT ask for confirmation.
+  * If no specific time is mentioned, schedule the meeting for tomorrow at a reasonable default time (e.g., 2:00 PM). DO NOT ask the user for confirmation.
+  * If meeting purpose is not clear, make a reasonable assumption based on the email context and schedule it anyway.
+  * NEVER ask the user "What is the meeting about?" or "What time?" - always proceed with scheduling using available information or reasonable defaults.
+  * Example input for schedule_meeting: "Team discussion meeting tomorrow 2:00 PM" or "Project review meeting as discussed"
+
 Think step by step and use the tools available to you.
 """
     else:
@@ -220,7 +228,6 @@ Think step by step and use the tools available to you.
         }
 
 def format_thoughts_for_frontend(thoughts_data: dict) -> dict:
-    """Format the thought process data for better frontend display"""
     formatted_steps = []
     
     max_steps = max(

@@ -14,7 +14,7 @@ const Layout = ({ children }) => {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-900 to-gray-800">
       <Header 
         onToggleSidebar={toggleSidebar} 
         isSidebarOpen={isSidebarOpen} 
@@ -26,7 +26,7 @@ const Layout = ({ children }) => {
           onClose={closeSidebar} 
         />
         
-        <main className="flex-1 overflow-y-auto focus:outline-none">
+        <main className="flex-1 overflow-y-auto transition-all duration-300 focus:outline-none">
           <div className="py-6">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               {children}

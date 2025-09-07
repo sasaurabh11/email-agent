@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Mail, Calendar, User, Tag, Eye } from "lucide-react";
+import { Mail, Calendar, User, Tag, Eye, Reply, Clock } from "lucide-react";
+import Button from "../ui/Button";
 
 const EmailDetail = ({ email, onReply }) => {
   const [viewMode, setViewMode] = useState("html"); // 'plain', 'html', 'raw'
@@ -34,7 +35,7 @@ const EmailDetail = ({ email, onReply }) => {
     if (viewMode === "html" && htmlBody) {
       return (
         <div
-          className="prose max-w-none"
+          className="prose prose-invert max-w-none"
           dangerouslySetInnerHTML={{ __html: htmlBody }}
         />
       );
@@ -42,7 +43,7 @@ const EmailDetail = ({ email, onReply }) => {
 
     if (viewMode === "raw") {
       return (
-        <pre className="text-xs bg-gray-100 p-4 rounded overflow-x-auto">
+        <pre className="text-xs bg-gray-700 p-4 rounded-lg overflow-x-auto text-gray-300">
           {JSON.stringify(email, null, 2)}
         </pre>
       );
@@ -50,7 +51,7 @@ const EmailDetail = ({ email, onReply }) => {
 
     const content = plainBody || email.snippet || "No content available";
     return (
-      <pre className="whitespace-pre-wrap font-sans text-gray-800 leading-relaxed">
+      <pre className="whitespace-pre-wrap font-sans text-gray-300 leading-relaxed">
         {content}
       </pre>
     );
@@ -58,9 +59,11 @@ const EmailDetail = ({ email, onReply }) => {
 
   if (!email) {
     return (
-      <div className="p-6 text-center text-gray-500">
-        <Mail className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-        <p>Select an email to view details</p>
+      <div className="p-8 text-center text-gray-500 h-full flex items-center justify-center">
+        <div>
+          <Mail className="w-16 h-16 mx-auto mb-4 text-gray-600" />
+          <p className="text-gray-400">Select an email to view details</p>
+        </div>
       </div>
     );
   }
@@ -69,25 +72,25 @@ const EmailDetail = ({ email, onReply }) => {
   const hasPlain = email.plain_body && email.plain_body.trim();
 
   return (
-    <div className="p-6">
+    <div className="p-6 h-full flex flex-col">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">
+        <h1 className="text-2xl font-bold text-white mb-4">
           {email.subject || "(No Subject)"}
         </h1>
 
-        <div className="space-y-2 mb-4">
-          <div className="flex items-center text-sm text-gray-600">
+        <div className="space-y-3 mb-4">
+          <div className="flex items-center text-sm text-gray-400">
             <User className="w-4 h-4 mr-2 flex-shrink-0" />
             <span className="font-medium">From: </span>
             <span className="ml-1 truncate">{getSenderName(email.sender)}</span>
             {getSenderEmail(email.sender) && (
-              <span className="text-gray-400 ml-1 truncate">
+              <span className="text-gray-500 ml-1 truncate">
                 &lt;{getSenderEmail(email.sender)}&gt;
               </span>
             )}
           </div>
 
-          <div className="flex items-center text-sm text-gray-600">
+          <div className="flex items-center text-sm text-gray-400">
             <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
             <span className="font-medium">To: </span>
             <span className="ml-1 truncate">
@@ -97,7 +100,7 @@ const EmailDetail = ({ email, onReply }) => {
             </span>
           </div>
 
-          <div className="flex items-center text-sm text-gray-600">
+          <div className="flex items-center text-sm text-gray-400">
             <Calendar className="w-4 h-4 mr-2 flex-shrink-0" />
             <span className="font-medium">Date: </span>
             <span className="ml-1">{formatDate(email.date)}</span>
@@ -110,10 +113,10 @@ const EmailDetail = ({ email, onReply }) => {
             <span
               className={`px-3 py-1 rounded-full text-sm font-medium ${
                 email.classification === "important"
-                  ? "bg-red-100 text-red-800"
+                  ? "bg-red-500/20 text-red-400"
                   : email.classification === "urgent"
-                  ? "bg-orange-100 text-orange-800"
-                  : "bg-gray-100 text-gray-800"
+                  ? "bg-orange-500/20 text-orange-400"
+                  : "bg-gray-700 text-gray-300"
               }`}
             >
               {email.classification}
@@ -122,17 +125,17 @@ const EmailDetail = ({ email, onReply }) => {
         )}
       </div>
 
-      <div className="border-t border-gray-200 pt-6">
+      <div className="border-t border-gray-700 pt-6 flex-1 flex flex-col">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">Content</h2>
+          <h2 className="text-lg font-semibold text-white">Content</h2>
 
           <div className="flex space-x-2">
             <button
               onClick={() => setViewMode("plain")}
-              className={`px-3 py-1 text-sm rounded ${
+              className={`px-3 py-1 text-sm rounded-lg transition-colors ${
                 viewMode === "plain"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  ? "bg-indigo-500 text-white"
+                  : "bg-gray-700 text-gray-300 hover:bg-gray-600"
               }`}
             >
               Plain Text
@@ -141,10 +144,10 @@ const EmailDetail = ({ email, onReply }) => {
             {hasHtml && (
               <button
                 onClick={() => setViewMode("html")}
-                className={`px-3 py-1 text-sm rounded ${
+                className={`px-3 py-1 text-sm rounded-lg transition-colors ${
                   viewMode === "html"
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    ? "bg-indigo-500 text-white"
+                    : "bg-gray-700 text-gray-300 hover:bg-gray-600"
                 }`}
               >
                 HTML
@@ -153,10 +156,10 @@ const EmailDetail = ({ email, onReply }) => {
 
             <button
               onClick={() => setViewMode("raw")}
-              className={`px-3 py-1 text-sm rounded ${
+              className={`px-3 py-1 text-sm rounded-lg transition-colors ${
                 viewMode === "raw"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  ? "bg-indigo-500 text-white"
+                  : "bg-gray-700 text-gray-300 hover:bg-gray-600"
               }`}
             >
               Raw Data
@@ -164,12 +167,12 @@ const EmailDetail = ({ email, onReply }) => {
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-lg p-4 max-h-96 overflow-y-auto">
+        <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 flex-1 overflow-y-auto">
           {renderEmailBody()}
         </div>
 
-        <div className="mt-6 border-t pt-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div className="mt-6 border-t border-gray-700 pt-4">
+          <label className="block text-sm font-medium text-gray-300 mb-2">
             Add your own instructions for the reply (optional):
           </label>
           <textarea
@@ -177,15 +180,16 @@ const EmailDetail = ({ email, onReply }) => {
             value={userContext}
             onChange={(e) => setUserContext(e.target.value)}
             placeholder="e.g., Keep it concise and polite..."
-            className="w-full border rounded-md p-2 mb-3 text-sm"
+            className="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
           />
 
-          <button
+          <Button
             onClick={() => onReply(email, userContext)}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            className="mt-3 bg-indigo-600 hover:bg-indigo-700"
           >
+            <Reply className="w-4 h-4 mr-2" />
             Reply with AI
-          </button>
+          </Button>
         </div>
       </div>
     </div>
