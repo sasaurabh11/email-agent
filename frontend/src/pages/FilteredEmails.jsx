@@ -74,7 +74,7 @@ const FilteredEmailsPage = () => {
         <Button 
           onClick={handleFilterAll} 
           disabled={loading || isFiltering}
-          className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+          className="bg-primary-gradient"
         >
           {isFiltering ? (
             <>
@@ -92,11 +92,11 @@ const FilteredEmailsPage = () => {
 
             {/* Statistics Card */}
       {Object.keys(grouped).length > 0 && (
-        <div className="glass border-gray-700 rounded-xl p-4">
+        <div className="glass border-subtle rounded-xl p-4">
           <h3 className="text-lg font-semibold text-white mb-4">Classification Statistics</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {Object.entries(grouped).map(([cls, mails]) => (
-              <div key={cls} className="bg-gray-800/50 rounded-lg p-3 border border-gray-700">
+              <div key={cls} className="bg-gray-800/50 rounded-lg p-3 border border-subtle">
                 <div className="flex items-center justify-between">
                   <span className={`px-2 py-1 rounded text-xs font-medium ${getClassificationColor(cls)}`}>
                     {cls}
@@ -126,14 +126,14 @@ const FilteredEmailsPage = () => {
       )}
 
       {Object.keys(grouped).length === 0 ? (
-        <div className="glass border-gray-700 rounded-xl p-8 text-center">
+        <div className="glass border-subtle rounded-xl p-8 text-center">
           <Filter className="w-16 h-16 text-gray-600 mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-gray-300 mb-2">No Classified Emails Yet</h2>
           <p className="text-gray-500 mb-6">Use the AI classifier to organize your emails automatically</p>
           <Button 
             onClick={handleFilterAll} 
             disabled={loading || isFiltering}
-            className="bg-indigo-600 hover:bg-indigo-700"
+            className="bg-primary"
           >
             <Sparkles className="w-4 h-4 mr-2" />
             Start Classification
@@ -142,8 +142,8 @@ const FilteredEmailsPage = () => {
       ) : (
         <div className="space-y-6">
           {Object.entries(grouped).map(([cls, mails]) => (
-            <div key={cls} className="glass border-gray-700 rounded-xl overflow-hidden">
-              <div className="p-4 border-b border-gray-700 bg-gray-800/50">
+            <div key={cls} className="glass border-subtle rounded-xl overflow-hidden">
+              <div className="p-4 border-b border-subtle bg-gray-800/50">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
                     <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getClassificationColor(cls)}`}>
@@ -165,7 +165,7 @@ const FilteredEmailsPage = () => {
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex-1 min-w-0">
                         <h3 className="font-medium text-white truncate flex items-center">
-                          <Mail className="w-4 h-4 text-indigo-400 mr-2 flex-shrink-0" />
+                          <Mail className="w-4 h-4 text-primary mr-2 flex-shrink-0" />
                           {email.subject || "(No Subject)"}
                         </h3>
                         <p className="text-sm text-gray-400 mt-1 line-clamp-2">
@@ -173,7 +173,7 @@ const FilteredEmailsPage = () => {
                         </p>
                       </div>
                       <div className="ml-4 flex-shrink-0">
-                        <span className="text-xs text-gray-500 bg-gray-700 px-2 py-1 rounded">
+                        <span className="text-xs text-gray-500 bg-primary-soft px-2 py-1 rounded">
                           {formatDate(email.date)}
                         </span>
                       </div>
@@ -193,7 +193,7 @@ const FilteredEmailsPage = () => {
                           </span>
                         )}
                         {!email.read && (
-                          <span className="w-2 h-2 bg-indigo-400 rounded-full"></span>
+                          <span className="w-2 h-2 bg-primary rounded-full"></span>
                         )}
                       </div>
                     </div>

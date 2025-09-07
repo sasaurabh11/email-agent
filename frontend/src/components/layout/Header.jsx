@@ -16,19 +16,34 @@ import {
   Filter
 } from 'lucide-react';
 
+const THEMES = [
+  { key: 'indigo', label: 'Indigo' },
+  { key: 'emerald', label: 'Emerald' },
+  { key: 'rose', label: 'Rose' },
+  { key: 'amber', label: 'Amber' },
+  { key: 'sky', label: 'Sky' },
+  { key: 'violet', label: 'Violet' },
+];
+
 const Header = ({ onToggleSidebar, isSidebarOpen }) => {
   const { user, logout } = useAuth();
   const location = useLocation();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [theme, setTheme] = useState('indigo');
+  const [appearance, setAppearance] = useState('system'); // 'system' | 'light' | 'dark'
 
   useEffect(() => {
     const root = document.documentElement;
-    const saved = localStorage.getItem('theme');
+    const savedTheme = localStorage.getItem('colorTheme') || 'indigo';
+    const savedAppearance = localStorage.getItem('appearance') || 'system';
     const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const enableDark = saved ? saved === 'dark' : prefersDark;
+    const enableDark = savedAppearance === 'dark' ? true : savedAppearance === 'light' ? false : prefersDark;
+    setTheme(savedTheme);
+    setAppearance(savedAppearance);
     setDarkMode(enableDark);
+    root.setAttribute('data-theme', savedTheme);
     root.classList.toggle('dark', enableDark);
   }, []);
 
@@ -37,6 +52,32 @@ const Header = ({ onToggleSidebar, isSidebarOpen }) => {
     root.classList.toggle('dark', darkMode);
     localStorage.setItem('theme', darkMode ? 'dark' : 'light');
   }, [darkMode]);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    root.setAttribute('data-theme', theme);
+    localStorage.setItem('colorTheme', theme);
+  }, [theme]);
+
+  // React to appearance selection and system changes
+  useEffect(() => {
+    const media = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+
+    const apply = () => {
+      const prefersDark = media ? media.matches : true;
+      const nextDark = appearance === 'dark' ? true : appearance === 'light' ? false : prefersDark;
+      setDarkMode(nextDark);
+      localStorage.setItem('appearance', appearance);
+    };
+
+    apply();
+    if (media && appearance === 'system') {
+      media.addEventListener ? media.addEventListener('change', apply) : media.addListener && media.addListener(apply);
+      return () => {
+        media.removeEventListener ? media.removeEventListener('change', apply) : media.removeListener && media.removeListener(apply);
+      };
+    }
+  }, [appearance]);
 
   const navigation = [
     { name: 'Dashboard', href: '/', icon: BarChart3 },
@@ -48,7 +89,8 @@ const Header = ({ onToggleSidebar, isSidebarOpen }) => {
   const isActive = (path) => location.pathname === path;
 
   const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
+    // Quick toggle between light and dark; does not change 'system' explicitly
+    setAppearance(darkMode ? 'light' : 'dark');
   };
 
   const handleSearch = (e) => {
@@ -71,10 +113,10 @@ const Header = ({ onToggleSidebar, isSidebarOpen }) => {
             
             <div className="flex items-center ml-4 lg:ml-0">
               <div className="relative">
-                <Mail className="h-8 w-8 text-indigo-400" />
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-indigo-500 rounded-full animate-pulse"></div>
+                <Mail className="h-8 w-8 text-primary" />
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full animate-pulse"></div>
               </div>
-              <h1 className="ml-2 text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400 hidden sm:block">
+              <h1 className="ml-2 text-xl font-bold bg-clip-text text-transparent bg-primary-gradient hidden sm:block">
                 FocusMail
               </h1>
             </div>
@@ -82,6 +124,29 @@ const Header = ({ onToggleSidebar, isSidebarOpen }) => {
 
           {/* Right side */}
           <div className="flex items-center space-x-3">
+            {/* Appearance selector */}
+            {/* <select
+              value={appearance}
+              onChange={(e) => setAppearance(e.target.value)}
+              className="glass border-subtle text-sm px-2 py-1 rounded-md text-gray-200 hover:bg-gray-800"
+              aria-label="Select appearance"
+            >
+              <option value="system" className="bg-gray-900">System</option>
+              <option value="light" className="bg-gray-900">Light</option>
+              <option value="dark" className="bg-gray-900">Dark</option>
+            </select> */}
+            {/* Theme selector */}
+            <select
+              value={theme}
+              onChange={(e) => setTheme(e.target.value)}
+              className="glass border-subtle text-sm px-2 py-1 rounded-md text-gray-200 hover:bg-gray-800"
+              aria-label="Select color theme"
+            >
+              {THEMES.map(t => (
+                <option key={t.key} value={t.key} className="bg-gray-900">{t.label}</option>
+              ))}
+            </select>
+
             <button 
               onClick={toggleDarkMode}
               className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-md transition-colors"
@@ -92,7 +157,7 @@ const Header = ({ onToggleSidebar, isSidebarOpen }) => {
 
             <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-md transition-colors relative">
               <Bell className="w-5 h-5" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+              <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full"></span>
             </button>
 
             <div className="relative">
@@ -100,7 +165,7 @@ const Header = ({ onToggleSidebar, isSidebarOpen }) => {
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
                 className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-800 transition-colors"
               >
-                <div className="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-primary-gradient rounded-full flex items-center justify-center">
                   <User className="w-4 h-4 text-white" />
                 </div>
                 <span className="hidden sm:block text-sm font-medium text-gray-200">

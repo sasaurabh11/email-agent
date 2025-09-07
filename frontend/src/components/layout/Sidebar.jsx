@@ -54,8 +54,8 @@ const Sidebar = ({ isOpen, onClose }) => {
           {(!isCollapsed || isOpen) && (
             <div className="flex items-center">
               <div className="relative">
-                <Mail className="h-8 w-8 text-indigo-400" />
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-indigo-500 rounded-full animate-pulse"></div>
+                <Mail className="h-8 w-8 text-primary" />
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full animate-pulse"></div>
               </div>
               <span className="ml-2 text-xl font-bold text-white">FocusMail</span>
             </div>
@@ -95,14 +95,14 @@ const Sidebar = ({ isOpen, onClose }) => {
                     onClick={onClose}
                     className={`flex items-center px-3 py-3 text-sm font-medium rounded-md transition-all hover-float ${
                       active
-                        ? 'text-white bg-indigo-900 shadow-lg'
+                        ? 'text-white bg-primary-soft shadow-lg'
                         : 'text-gray-400 hover:text-white hover:bg-gray-800'
                     }`}
                   >
                     <Icon className="w-5 h-5" />
                     {(!isCollapsed || isOpen) && <span className="ml-3">{item.name}</span>}
                     {active && (
-                      <div className="ml-auto w-2 h-2 bg-indigo-400 rounded-full"></div>
+                      <div className="ml-auto w-2 h-2 bg-primary rounded-full"></div>
                     )}
                   </Link>
                 );
@@ -124,7 +124,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                     onClick={onClose}
                     className="flex items-center px-3 py-3 text-sm rounded-md bg-gray-800/60 hover:bg-gray-800 transition-colors group border border-subtle"
                   >
-                    <div className="p-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-md">
+                    <div className="p-1 bg-primary-gradient rounded-md">
                       <Icon className="w-4 h-4 text-white" />
                     </div>
                     {(!isCollapsed || isOpen) && (
@@ -143,7 +143,7 @@ const Sidebar = ({ isOpen, onClose }) => {
         {/* Footer */}
         <div className={`px-4 py-4 border-t border-subtle ${(isCollapsed && !isOpen) && 'lg:hidden'}`}>
           <div className="flex items-center">
-            <div className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 bg-primary-gradient rounded-full flex items-center justify-center">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
             <div className="ml-3">

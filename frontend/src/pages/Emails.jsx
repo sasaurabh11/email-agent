@@ -125,7 +125,7 @@ const Emails = () => {
   return (
     <div className="flex flex-col min-h-screen space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center p-4 border-b border-gray-800 bg-gray-900">
+      <div className="flex justify-between items-center p-4 border-b border-subtle glass">
         <div>
           <h1 className="text-2xl font-bold text-white">Inbox</h1>
           <p className="text-gray-400 text-sm">
@@ -156,21 +156,21 @@ const Emails = () => {
 
       {/* Filters */}
       {showFilters && (
-        <div className="p-4 border-b border-gray-800 bg-gray-900">
+        <div className="p-4 border-b border-subtle glass">
           <EmailFilters />
         </div>
       )}
 
       {/* Search */}
-      <div className="p-4 border-b border-gray-800 bg-gray-900">
+      <div className="p-4 border-b border-subtle glass">
         <SearchBox userId={user} onResults={setSearchResults} />
       </div>
 
       {/* Main Layout */}
       <div className={`grid gap-6 overflow-hidden ${layout === "split" ? "xl:grid-cols-3" : "grid-cols-1"}`}>
         {/* Email List */}
-        <div className={`bg-gray-900 border border-gray-800 rounded-xl ${layout === "split" ? "xl:col-span-1" : ""}`}>
-          <div className="p-3 border-b border-gray-800 flex justify-between items-center">
+        <div className={`glass border border-subtle rounded-xl ${layout === "split" ? "xl:col-span-1" : ""}`}>
+          <div className="p-3 border-b border-subtle flex justify-between items-center">
             <h2 className="text-white font-semibold">
               Emails ({relevantEmails ? relevantEmails.length : filteredEmails.length})
             </h2>
@@ -188,7 +188,7 @@ const Emails = () => {
           <div className="flex-1 overflow-y-auto max-h-[calc(300vh-22rem)] scrollbar-hide">
             {searchResults ? (
               <>
-                <div className="p-3 border-b border-gray-800">
+                <div className="p-3 border-b border-subtle">
                   <h2 className="font-bold text-white mb-1">AI Answer</h2>
                   <p className="text-gray-300 text-sm">{searchResults.answer}</p>
                 </div>
@@ -210,11 +210,11 @@ const Emails = () => {
 
         {/* Email Detail */}
         {(layout === "split" || selectedEmail) && (
-          <div className={`bg-gray-900 border border-gray-800 rounded-xl ${layout === "split" ? "xl:col-span-2" : ""}`}>
+          <div className={`glass border border-subtle rounded-xl ${layout === "split" ? "xl:col-span-2" : ""}`}>
             {selectedEmail ? (
               <div className="flex flex-col">
                 {/* AI Panels */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border-b border-gray-700">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border-b border-subtle">
                   <FilterPanel email={selectedEmail} />
                   <SummaryPanel email={selectedEmail} />
                 </div>

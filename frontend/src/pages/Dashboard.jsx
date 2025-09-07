@@ -131,8 +131,8 @@ const Dashboard = () => {
         <Card className="hover-float transition-all">
           <CardContent className="p-6">
             <div className="flex items-center">
-              <div className="p-3 rounded-full bg-indigo-500/20">
-                <Mail className="w-6 h-6 text-indigo-400" />
+              <div className="p-3 rounded-full bg-primary-soft">
+                <Mail className="w-6 h-6 text-primary" />
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-400">
@@ -149,8 +149,8 @@ const Dashboard = () => {
         <Card className="hover-float transition-all">
           <CardContent className="p-6">
             <div className="flex items-center">
-              <div className="p-3 rounded-full bg-green-500/20">
-                <Brain className="w-6 h-6 text-green-400" />
+              <div className="p-3 rounded-full bg-primary-soft">
+                <Brain className="w-6 h-6 text-primary" />
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-400">
@@ -176,8 +176,8 @@ const Dashboard = () => {
         <Card className="hover-float transition-all">
           <CardContent className="p-6">
             <div className="flex items-center">
-              <div className="p-3 rounded-full bg-purple-500/20">
-                <FileText className="w-6 h-6 text-purple-400" />
+              <div className="p-3 rounded-full bg-primary-soft">
+                <FileText className="w-6 h-6 text-primary" />
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-400">
@@ -194,8 +194,8 @@ const Dashboard = () => {
         <Card className="hover-float transition-all">
           <CardContent className="p-6">
             <div className="flex items-center">
-              <div className="p-3 rounded-full bg-orange-500/20">
-                <AlertCircle className="w-6 h-6 text-orange-400" />
+              <div className="p-3 rounded-full bg-primary-soft">
+                <AlertCircle className="w-6 h-6 text-primary" />
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-400">
@@ -216,7 +216,7 @@ const Dashboard = () => {
         <Card>
           <CardHeader className="border-subtle">
             <h2 className="text-lg font-semibold text-white flex items-center">
-              <PieChart className="w-5 h-5 mr-2 text-indigo-400" />
+              <PieChart className="w-5 h-5 mr-2 text-primary" />
               Email Classification
             </h2>
           </CardHeader>
@@ -242,7 +242,7 @@ const Dashboard = () => {
                         </span>
                         <div className="w-20 bg-gray-700 rounded-full h-2">
                           <div
-                            className="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full"
+                            className="bg-primary-gradient h-2 rounded-full"
                             style={{
                               width: `${
                                 (count / processingStats.totalProcessed) * 100
@@ -263,7 +263,7 @@ const Dashboard = () => {
         <Card>
           <CardHeader className="border-subtle">
             <h2 className="text-lg font-semibold text-white flex items-center">
-              <Zap className="w-5 h-5 mr-2 text-yellow-400" />
+              <Zap className="w-5 h-5 mr-2 text-primary" />
               AI Agent Actions
             </h2>
           </CardHeader>
@@ -275,7 +275,7 @@ const Dashboard = () => {
                 className="w-full justify-start glass border-subtle hover:bg-gray-800 text-gray-300"
                 disabled={loading}
               >
-                <Brain className="w-4 h-4 mr-2 text-indigo-400" />
+                <Brain className="w-4 h-4 mr-2 text-primary" />
                 Classify All Emails
                 <ChevronRight className="w-4 h-4 ml-auto text-gray-500" />
               </Button>
@@ -284,7 +284,7 @@ const Dashboard = () => {
                 variant="outline"
                 className="w-full justify-start glass border-subtle hover:bg-gray-800 text-gray-300"
               >
-                <FileText className="w-4 h-4 mr-2 text-purple-400" />
+                <FileText className="w-4 h-4 mr-2 text-primary" />
                 Generate Summaries
                 <ChevronRight className="w-4 h-4 ml-auto text-gray-500" />
               </Button>
@@ -293,7 +293,7 @@ const Dashboard = () => {
                 variant="outline"
                 className="w-full justify-start glass border-subtle hover:bg-gray-800 text-gray-300"
               >
-                <Search className="w-4 h-4 mr-2 text-blue-400" />
+                <Search className="w-4 h-4 mr-2 text-primary" />
                 AI Search Emails
                 <ChevronRight className="w-4 h-4 ml-auto text-gray-500" />
               </Button>
@@ -302,7 +302,7 @@ const Dashboard = () => {
                 variant="outline"
                 className="w-full justify-start glass border-subtle hover:bg-gray-800 text-gray-300"
               >
-                <Sparkles className="w-4 h-4 mr-2 text-pink-400" />
+                <Sparkles className="w-4 h-4 mr-2 text-primary" />
                 Run AI Agent
                 <ChevronRight className="w-4 h-4 ml-auto text-gray-500" />
               </Button>
@@ -314,7 +314,7 @@ const Dashboard = () => {
         <Card>
           <CardHeader className="border-subtle">
             <h2 className="text-lg font-semibold text-white flex items-center">
-              <Activity className="w-5 h-5 mr-2 text-green-400" />
+              <Activity className="w-5 h-5 mr-2 text-primary" />
               Recent AI Activity
             </h2>
           </CardHeader>
@@ -340,12 +340,12 @@ const Dashboard = () => {
                     </div>
                     <div className="flex items-center space-x-2 ml-2">
                       {email.classification && (
-                        <span className="px-2 py-1 text-xs font-medium rounded-full bg-indigo-500/20 text-indigo-300">
+                        <span className="px-2 py-1 text-xs font-medium rounded-full bg-primary-soft text-primary">
                           {email.classification}
                         </span>
                       )}
                       {email.summaries && (
-                        <CheckCircle className="w-4 h-4 text-green-400" />
+                        <CheckCircle className="w-4 h-4 text-primary" />
                       )}
                     </div>
                   </div>
@@ -368,7 +368,7 @@ const Dashboard = () => {
               variant="outline"
               className="h-20 flex-col glass border-subtle hover:bg-gray-800 text-gray-300"
             >
-              <Mail className="w-6 h-6 mb-2 text-indigo-400" />
+              <Mail className="w-6 h-6 mb-2 text-primary" />
               <span>Email Inbox</span>
             </Button>
             <Button
@@ -376,7 +376,7 @@ const Dashboard = () => {
               variant="outline"
               className="h-20 flex-col glass border-subtle hover:bg-gray-800 text-gray-300"
             >
-              <FileText className="w-6 h-6 mb-2 text-purple-400" />
+              <FileText className="w-6 h-6 mb-2 text-primary" />
               <span>Summaries</span>
             </Button>
             <Button
@@ -384,7 +384,7 @@ const Dashboard = () => {
               variant="outline"
               className="h-20 flex-col glass border-subtle hover:bg-gray-800 text-gray-300"
             >
-              <Filter className="w-6 h-6 mb-2 text-blue-400" />
+              <Filter className="w-6 h-6 mb-2 text-primary" />
               <span>Filtered Emails</span>
             </Button>
           </div>

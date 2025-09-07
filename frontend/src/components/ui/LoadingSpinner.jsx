@@ -13,7 +13,7 @@ const LoadingSpinner = ({
   };
 
   const variantClasses = {
-    primary: 'border-indigo-500',
+    primary: 'border-[var(--primary)]',
     secondary: 'border-gray-400',
     success: 'border-green-500',
     warning: 'border-yellow-500',
@@ -24,7 +24,12 @@ const LoadingSpinner = ({
   if (variant === 'gradient') {
     return (
       <div className={`animate-spin rounded-full ${sizeClasses[size]} ${className}`}>
-        <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-indigo-500 border-r-purple-500 border-b-pink-500 border-l-blue-500"></div>
+        <div className="absolute inset-0 rounded-full border-2 border-transparent" style={{
+          borderTopColor: 'var(--primary)',
+          borderRightColor: 'var(--primary)',
+          borderBottomColor: 'var(--primary-2)',
+          borderLeftColor: 'var(--primary-2)'
+        }}></div>
       </div>
     );
   }
@@ -69,7 +74,7 @@ export const DotsLoader = ({
   };
 
   const variantClasses = {
-    primary: 'bg-indigo-500',
+    primary: 'bg-[var(--primary)]',
     secondary: 'bg-gray-400',
     success: 'bg-green-500',
     warning: 'bg-yellow-500',

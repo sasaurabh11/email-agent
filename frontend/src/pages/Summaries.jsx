@@ -116,7 +116,7 @@ const Summaries = () => {
         </div>
         <Button
           onClick={() => setIsDraftModalOpen(true)}
-          className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+          className="bg-primary-gradient"
         >
           <Sparkles className="w-4 h-4 mr-2" />
           Generate Draft
@@ -126,8 +126,8 @@ const Summaries = () => {
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         {/* Left Panel - Options and Lists */}
         <div className="xl:col-span-1 space-y-4">
-          <Card className="glass border-gray-700">
-            <CardHeader className="border-gray-700">
+          <Card className="glass border-subtle">
+            <CardHeader className="border-subtle">
               <h2 className="text-lg font-semibold text-white">Summary Options</h2>
             </CardHeader>
             <CardContent>
@@ -143,8 +143,8 @@ const Summaries = () => {
                         onClick={() => setSummaryMode(mode.value)}
                         className={`w-full text-left p-3 rounded-lg border transition-all ${
                           summaryMode === mode.value
-                            ? 'bg-indigo-500/20 border-indigo-500/50 text-white'
-                            : 'bg-gray-800/50 border-gray-600 text-gray-300 hover:bg-gray-700/50'
+                            ? 'bg-primary-soft border-[color:var(--primary)]/50 text-white'
+                            : 'bg-gray-800/50 border-subtle text-gray-300 hover:bg-gray-700/50'
                         }`}
                       >
                         <div className="font-medium">{mode.label}</div>
@@ -157,10 +157,10 @@ const Summaries = () => {
             </CardContent>
           </Card>
 
-          <Card className="glass border-gray-700">
-            <CardHeader className="border-gray-700">
+          <Card className="glass border-subtle">
+            <CardHeader className="border-subtle">
               <div className="flex items-center">
-                <Mail className="w-5 h-5 text-indigo-400 mr-2" />
+                <Mail className="w-5 h-5 text-primary mr-2" />
                 <h2 className="text-lg font-semibold text-white">Recent Emails</h2>
               </div>
               <span className="text-sm text-gray-400">{emails.length} total</span>
@@ -173,8 +173,8 @@ const Summaries = () => {
                     onClick={() => handleEmailSummary(email)}
                     className={`p-3 rounded-lg border cursor-pointer transition-all ${
                       selectedEmail?.id === email.id 
-                        ? 'bg-indigo-500/20 border-indigo-500 text-white' 
-                        : 'bg-gray-800/50 border-gray-700 text-gray-300 hover:bg-gray-700/50'
+                        ? 'bg-primary-soft border-[color:var(--primary)] text-white' 
+                        : 'bg-gray-800/50 border-subtle text-gray-300 hover:bg-gray-700/50'
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -182,7 +182,7 @@ const Summaries = () => {
                         {email.subject || '(No Subject)'}
                       </span>
                       {email.summaries && (
-                        <FileText className="w-4 h-4 text-green-400 flex-shrink-0" />
+                        <FileText className="w-4 h-4 text-primary flex-shrink-0" />
                       )}
                     </div>
                     <p className="text-xs text-gray-400 truncate mt-1">
@@ -194,10 +194,10 @@ const Summaries = () => {
             </CardContent>
           </Card>
 
-          <Card className="glass border-gray-700">
-            <CardHeader className="border-gray-700">
+          <Card className="glass border-subtle">
+            <CardHeader className="border-subtle">
               <div className="flex items-center">
-                <MessageSquare className="w-5 h-5 text-purple-400 mr-2" />
+                <MessageSquare className="w-5 h-5 text-primary mr-2" />
                 <h2 className="text-lg font-semibold text-white">Threads</h2>
               </div>
               <span className="text-sm text-gray-400">{getUniqueThreads().length} total</span>
@@ -210,15 +210,15 @@ const Summaries = () => {
                     onClick={() => handleThreadSummary(thread.thread_id)}
                     className={`p-3 rounded-lg border cursor-pointer transition-all ${
                       selectedThread?.[0]?.thread_id === thread.thread_id 
-                        ? 'bg-purple-500/20 border-purple-500 text-white' 
-                        : 'bg-gray-800/50 border-gray-700 text-gray-300 hover:bg-gray-700/50'
+                        ? 'bg-primary-soft border-[color:var(--primary)] text-white' 
+                        : 'bg-gray-800/50 border-subtle text-gray-300 hover:bg-gray-700/50'
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium truncate">
                         {thread.subject || 'Thread'}
                       </span>
-                      <span className="text-xs text-gray-400 bg-gray-700 px-2 py-1 rounded-full">
+                      <span className="text-xs text-gray-400 bg-primary-soft px-2 py-1 rounded-full">
                         {emails.filter(e => e.thread_id === thread.thread_id).length}
                       </span>
                     </div>
@@ -234,8 +234,8 @@ const Summaries = () => {
 
         {/* Right Panel - Summary Output */}
         <div className="xl:col-span-2">
-          <Card className="glass border-gray-700 h-full">
-            <CardHeader className="border-gray-700">
+          <Card className="glass border-subtle h-full">
+            <CardHeader className="border-subtle">
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-lg font-semibold text-white">
@@ -275,15 +275,15 @@ const Summaries = () => {
                 </div>
               ) : generatedSummary ? (
                 <div className="space-y-4">
-                  <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+                  <div className="bg-gray-800/50 rounded-lg p-4 border border-subtle">
                     <pre className="whitespace-pre-wrap text-gray-300 leading-relaxed">
                       {generatedSummary}
                     </pre>
                   </div>
                   
                   {(selectedEmail || selectedThread) && (
-                    <div className="p-4 bg-indigo-500/10 rounded-lg border border-indigo-500/20">
-                      <h4 className="text-sm font-medium text-indigo-300 mb-2">Summary Details</h4>
+                    <div className="p-4 bg-primary-soft rounded-lg border border-[color:var(--primary)]/20">
+                      <h4 className="text-sm font-medium text-primary mb-2">Summary Details</h4>
                       <div className="text-sm text-gray-400 space-y-1">
                         <div className="flex items-center">
                           <Layers className="w-4 h-4 mr-2" />
@@ -311,7 +311,7 @@ const Summaries = () => {
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <FileText className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+                  <FileText className="w-16 h-16 text-primary mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-gray-300 mb-2">No Summary Generated</h3>
                   <p className="text-gray-500">
                     Select an email or thread from the left panel to generate a summary.

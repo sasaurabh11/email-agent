@@ -14,7 +14,7 @@ const Layout = ({ children }) => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-900 to-gray-800">
+    <div className="min-h-screen flex flex-col">
       <Header 
         onToggleSidebar={toggleSidebar} 
         isSidebarOpen={isSidebarOpen} 
