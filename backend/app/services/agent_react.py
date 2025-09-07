@@ -1,7 +1,6 @@
 import re
 from langchain.agents import initialize_agent, Tool
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain.memory import ConversationBufferMemory
 from langchain.callbacks.base import BaseCallbackHandler
 from app.services.agent_tools import (
     sync_summarization_tool, 
@@ -14,30 +13,71 @@ from app.core.config import settings
 import asyncio
 import time
 import threading
+from typing import Dict, Any, List
 
-class ThoughtCaptureHandler(BaseCallbackHandler):
+class EnhancedThoughtCaptureHandler(BaseCallbackHandler):
     def __init__(self):
         self.logs = []
+        self.current_step = 0
+        self.thoughts = []
+        self.actions = []
+        self.observations = []
 
     def on_agent_action(self, action, **kwargs):
-        # Capture intermediate "Thought/Action/Action Input"
-        text = f"Thought: {action.log}"
-        self.logs.append(text)
+        self.current_step += 1
+        
+        thought_match = re.search(r'Thought:\s*(.*?)(?=Action:|$)', action.log, re.DOTALL)
+        if thought_match:
+            thought = thought_match.group(1).strip()
+            self.thoughts.append({
+                "step": self.current_step,
+                "thought": thought,
+                "timestamp": time.strftime('%H:%M:%S')
+            })
+            self.logs.append(f"Step {self.current_step} - Thought: {thought}")
+
+        action_info = {
+            "step": self.current_step,
+            "tool": action.tool,
+            "tool_input": action.tool_input,
+            "timestamp": time.strftime('%H:%M:%S')
+        }
+        self.actions.append(action_info)
+        self.logs.append(f"Step {self.current_step} - Action: {action.tool}")
+        self.logs.append(f"Step {self.current_step} - Action Input: {action.tool_input}")
 
     def on_tool_end(self, output, **kwargs):
-        # Capture tool results (Observation)
-        self.logs.append(f"Observation: {output}")
+        observation = {
+            "step": self.current_step,
+            "output": str(output),
+            "timestamp": time.strftime('%H:%M:%S')
+        }
+        self.observations.append(observation)
+        self.logs.append(f"Step {self.current_step} - Observation: {output}")
 
     def on_llm_start(self, serialized, prompts, **kwargs):
-        """Log when LLM call starts"""
         self.logs.append(f"LLM Call Starting at {time.strftime('%H:%M:%S')}")
 
     def on_llm_end(self, response, **kwargs):
-        # Capture when LLM call ends
         self.logs.append(f"LLM Call Completed at {time.strftime('%H:%M:%S')}")
+
+    def on_agent_finish(self, finish, **kwargs):
+        self.logs.append(f"Final Answer: {finish.return_values.get('output', '')}")
+
+    def on_text(self, text: str, **kwargs) -> None:
+        if "Thought:" in text:
+            self.logs.append(f"Additional Thought: {text}")
 
     def get_logs(self):
         return self.logs
+
+    def get_structured_data(self):
+        return {
+            "thoughts": self.thoughts,
+            "actions": self.actions,
+            "observations": self.observations,
+            "raw_logs": self.logs
+        }
 
 def extract_email(sender: str) -> str:
     match = re.search(r'<(.+?)>', sender)
@@ -97,17 +137,15 @@ def get_tools(user_id: str, email_id: str, email_doc: dict):
     ]
 
 def get_agent_executor(user_id, email_id, email_doc):
-    memory = ConversationBufferMemory(memory_key="chat_history")
-    handler = ThoughtCaptureHandler()
+    handler = EnhancedThoughtCaptureHandler()
     agent = initialize_agent(
         tools=get_tools(user_id, email_id, email_doc),
         llm=gemini_model,
         agent="zero-shot-react-description",
-        memory=memory,
         verbose=True,
         callbacks=[handler],
-        max_iterations=5,  # Limit iterations to prevent excessive calls
-        early_stopping_method="generate"  # Stop early if possible
+        max_iterations=5,
+        early_stopping_method="generate"
     )
     return agent, handler
 
@@ -128,32 +166,95 @@ From: {email_sender}
 Body: {email_body}
 
 Steps:
-1. Classify email
-2. Summarize it
-3. Decide next actions
+1. Classify email using filter_email tool
+2. Summarize it using summarize_email tool
+3. Decide next actions based on email content
 4. If you need more info from user, respond in this format:
    <<REQUEST_INFO: your question here>>
+
+Think step by step and use the tools available to you.
 """
     else:
-        query = f"User provided additional info: {user_input}"
+        query = f"User provided additional info: {user_input}. Continue processing the email with this new information."
 
     print(f"Starting agent execution at {time.strftime('%H:%M:%S')}")
-    result = agent.run(query)
-    print(f"Agent execution completed at {time.strftime('%H:%M:%S')}")
+    
+    try:
+        result = agent.invoke({"input": query})
+        print(f"Agent execution completed at {time.strftime('%H:%M:%S')}")
 
-    logs = handler.get_logs()   # <-- capture thought process
+        output = result.get("output", "")
 
-    match = re.search(r'<<REQUEST_INFO:(.*?)>>', result)
-    if match:
+        logs = handler.get_logs()
+        structured_thoughts = handler.get_structured_data()
+
+        match = re.search(r'<<REQUEST_INFO:(.*?)>>', output)
+        if match:
+            return {
+                "responses": [output],
+                "thoughts": logs,
+                "structured_thoughts": structured_thoughts,
+                "needs_input": True,
+                "prompt": match.group(1).strip()
+            }
+
         return {
-            "responses": [result],
+            "responses": [output],
             "thoughts": logs,
-            "needs_input": True,
-            "prompt": match.group(1).strip()
+            "structured_thoughts": structured_thoughts,
+            "needs_input": False
+        }
+        
+    except Exception as e:
+        print(f"Agent execution failed: {str(e)}")
+        
+        logs = handler.get_logs()
+        structured_thoughts = handler.get_structured_data()
+        
+        return {
+            "responses": [f"Error occurred: {str(e)}"],
+            "thoughts": logs,
+            "structured_thoughts": structured_thoughts,
+            "needs_input": False,
+            "error": str(e)
         }
 
+def format_thoughts_for_frontend(thoughts_data: dict) -> dict:
+    """Format the thought process data for better frontend display"""
+    formatted_steps = []
+    
+    max_steps = max(
+        len(thoughts_data.get("thoughts", [])),
+        len(thoughts_data.get("actions", [])),
+        len(thoughts_data.get("observations", []))
+    )
+    
+    for i in range(1, max_steps + 1):
+        step_data = {"step": i}
+        
+        thought = next((t for t in thoughts_data.get("thoughts", []) if t["step"] == i), None)
+        if thought:
+            step_data["thought"] = thought["thought"]
+            step_data["thought_timestamp"] = thought["timestamp"]
+        
+        action = next((a for a in thoughts_data.get("actions", []) if a["step"] == i), None)
+        if action:
+            step_data["action"] = {
+                "tool": action["tool"],
+                "input": action["tool_input"],
+                "timestamp": action["timestamp"]
+            }
+        
+        observation = next((o for o in thoughts_data.get("observations", []) if o["step"] == i), None)
+        if observation:
+            step_data["observation"] = {
+                "output": observation["output"],
+                "timestamp": observation["timestamp"]
+            }
+        
+        formatted_steps.append(step_data)
+    
     return {
-        "responses": [result],
-        "thoughts": logs,
-        "needs_input": False
+        "steps": formatted_steps,
+        "raw_logs": thoughts_data.get("raw_logs", [])
     }
