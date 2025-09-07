@@ -2,6 +2,7 @@ import re
 from langchain.agents import initialize_agent, Tool
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.memory import ConversationBufferMemory
+from langchain.callbacks.base import BaseCallbackHandler
 from app.services.agent_tools import (
     sync_summarization_tool, 
     sync_filtering_tool, 
@@ -10,7 +11,33 @@ from app.services.agent_tools import (
     sync_snooze_tool
 )
 from app.core.config import settings
+import asyncio
+import time
+import threading
 
+class ThoughtCaptureHandler(BaseCallbackHandler):
+    def __init__(self):
+        self.logs = []
+
+    def on_agent_action(self, action, **kwargs):
+        # Capture intermediate "Thought/Action/Action Input"
+        text = f"Thought: {action.log}"
+        self.logs.append(text)
+
+    def on_tool_end(self, output, **kwargs):
+        # Capture tool results (Observation)
+        self.logs.append(f"Observation: {output}")
+
+    def on_llm_start(self, serialized, prompts, **kwargs):
+        """Log when LLM call starts"""
+        self.logs.append(f"LLM Call Starting at {time.strftime('%H:%M:%S')}")
+
+    def on_llm_end(self, response, **kwargs):
+        # Capture when LLM call ends
+        self.logs.append(f"LLM Call Completed at {time.strftime('%H:%M:%S')}")
+
+    def get_logs(self):
+        return self.logs
 
 def extract_email(sender: str) -> str:
     match = re.search(r'<(.+?)>', sender)
@@ -19,8 +46,8 @@ def extract_email(sender: str) -> str:
     return sender.strip()
 
 gemini_model = ChatGoogleGenerativeAI(
-    model="gemma-3-27b-it",
-    api_key=settings.GEMINI_API_KEY,
+    model="gemini-2.5-flash",
+    api_key=settings.GEMINI_API_KEY_2,
     temperature=0,
 )
 
@@ -71,28 +98,29 @@ def get_tools(user_id: str, email_id: str, email_doc: dict):
 
 def get_agent_executor(user_id, email_id, email_doc):
     memory = ConversationBufferMemory(memory_key="chat_history")
+    handler = ThoughtCaptureHandler()
     agent = initialize_agent(
         tools=get_tools(user_id, email_id, email_doc),
         llm=gemini_model,
         agent="zero-shot-react-description",
         memory=memory,
-        verbose=True
+        verbose=True,
+        callbacks=[handler],
+        max_iterations=5,  # Limit iterations to prevent excessive calls
+        early_stopping_method="generate"  # Stop early if possible
     )
-    return agent
+    return agent, handler
 
-def terminal_input_func(prompt: str) -> str:
-    """Get user input from terminal and block until user types response"""
-    return input(f"Agent is asking: {prompt}\nYour answer: ")
-
-async def run_agent_on_email(email: dict, user_id: str):
+async def run_agent_on_email(email: dict, user_id: str, user_input: str | None = None):
     email_id = email.get("id")
     email_body = email.get("body") or email.get("plain_body") or email.get("snippet", "")
     email_subject = email.get("subject", "No subject")
     email_sender = email.get("sender", "Unknown sender")
 
-    agent = get_agent_executor(user_id, email_id, email)
+    agent, handler = get_agent_executor(user_id, email_id, email)
 
-    query = f"""
+    if not user_input:  
+        query = f"""
 Process this email step by step:
 
 Subject: {email_subject}
@@ -106,19 +134,26 @@ Steps:
 4. If you need more info from user, respond in this format:
    <<REQUEST_INFO: your question here>>
 """
+    else:
+        query = f"User provided additional info: {user_input}"
 
-    responses = []
-    while True:
-        result = agent.run(query)
-        responses.append(result)
-        print("\nAgent Response:\n", result)
+    print(f"Starting agent execution at {time.strftime('%H:%M:%S')}")
+    result = agent.run(query)
+    print(f"Agent execution completed at {time.strftime('%H:%M:%S')}")
 
-        match = re.search(r'<<REQUEST_INFO:(.*?)>>', result)
-        if match:
-            prompt = match.group(1).strip()
-            user_input = terminal_input_func(prompt)
-            query = f"User provided additional info: {user_input}"
-        else:
-            break
+    logs = handler.get_logs()   # <-- capture thought process
 
-    return responses
+    match = re.search(r'<<REQUEST_INFO:(.*?)>>', result)
+    if match:
+        return {
+            "responses": [result],
+            "thoughts": logs,
+            "needs_input": True,
+            "prompt": match.group(1).strip()
+        }
+
+    return {
+        "responses": [result],
+        "thoughts": logs,
+        "needs_input": False
+    }

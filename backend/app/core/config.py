@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     
     # AI Providers
     GEMINI_API_KEY: str = ""
+    GEMINI_API_KEY_2: str = ""
     NEBIUS_API_KEY: str = ""
     
     # Email Providers
