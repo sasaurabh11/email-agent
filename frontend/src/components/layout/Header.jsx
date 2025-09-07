@@ -116,7 +116,7 @@ const Header = ({ onToggleSidebar, isSidebarOpen }) => {
                 <Mail className="h-8 w-8 text-primary" />
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full animate-pulse"></div>
               </div>
-              <h1 className="ml-2 text-xl font-bold bg-clip-text text-transparent bg-primary-gradient hidden sm:block">
+              <h1 className="ml-2 text-xl font-bold bg-clip-text  hidden sm:block">
                 FocusMail
               </h1>
             </div>
