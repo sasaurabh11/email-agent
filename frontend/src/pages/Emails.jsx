@@ -17,6 +17,7 @@ import Button from "../components/ui/Button";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 import SearchBox from "./SearchBox";
 import AgentModal from "./AgentModal";
+import { agentAPI } from "../services/api";
 
 const Emails = () => {
   const { user } = useAuth();
@@ -44,8 +45,8 @@ const Emails = () => {
     setAgentOpen(true);
     setAgentData(null);
     try {
-      // const data = await agentAPI.callAgent(email.id, user);
-      // setAgentData(data.result);
+      const data = await agentAPI.callAgent(email.id, user);
+      setAgentData(data.result);
     } catch (err) {
       console.error("Agent run failed", err);
       setAgentData(["❌ Failed to run agent"]);
