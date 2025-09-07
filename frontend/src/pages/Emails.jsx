@@ -64,7 +64,7 @@ const Emails = () => {
   }, [searchResults, emails]);
 
   useEffect(() => {
-    if (user) fetchEmails(user.id);
+    if (user) fetchEmails(user.id, true);
   }, [user, fetchEmails]);
 
   useEffect(() => {
@@ -185,7 +185,7 @@ const Emails = () => {
               </Button>
             )}
           </div>
-          <div className="flex-1 overflow-y-auto max-h-[calc(300vh-22rem)] scrollbar-hide">
+          <div className="flex-1 overflow-y-auto max-h-[calc(300vh-22rem)] scrollbar-custom">
             {searchResults ? (
               <>
                 <div className="p-3 border-b border-subtle">

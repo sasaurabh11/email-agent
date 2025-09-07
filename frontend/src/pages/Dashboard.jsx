@@ -40,7 +40,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (user?.id) {
-      fetchEmails(user.id);
+      fetchEmails(user.id, true);
     }
   }, [user, fetchEmails]);
 

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from "react";
+import React, { createContext, useContext, useState, useCallback, useRef, useEffect } from "react";
 import { mailAPI } from "../services/api";
 
 const EmailContext = createContext();
@@ -12,11 +12,18 @@ export const EmailProvider = ({ children }) => {
   const [threadSummaries, setThreadSummaries] = useState({});
   const [draft, setDraft] = useState("");
 
+  const emailsRef = useRef([]);
+  const ragIndexInFlight = useRef(false);
+  
+  useEffect(() => {
+    emailsRef.current = emails;
+  }, [emails]);
+
   const fetchEmails = useCallback(
     async (userId, force = false) => {
       if (!userId) return;
 
-      if (emails.length > 0 && !force) {
+      if (emailsRef.current && emailsRef.current.length > 0 && !force) {
         return;
       }
 
@@ -29,31 +36,38 @@ export const EmailProvider = ({ children }) => {
           sessionStorage.setItem("emails_synced", "true");
         }
 
-        if (emails.length === 0 || force) {
-          const res = await mailAPI.getEmails(userId);
-          const response = res.data;
+        const res = await mailAPI.getEmails(userId);
+        const response = res.data;
 
-          if (response.emails && Array.isArray(response.emails)) {
-            const sortedEmails = response.emails.sort(
-              (a, b) => new Date(b.date) - new Date(a.date)
-            );
-            setEmails(sortedEmails);
-            setFilteredEmails(sortedEmails);
-          } else {
-            console.warn("Invalid email response format:", response);
-            setEmails([]);
-            setFilteredEmails([]);
-          }
-
-          mailAPI.ragIndex(userId);
+        if (response.emails && Array.isArray(response.emails)) {
+          const sortedEmails = response.emails.sort(
+            (a, b) => new Date(b.date) - new Date(a.date)
+          );
+          setEmails(sortedEmails);
+          setFilteredEmails(sortedEmails);
+        } else {
+          console.warn("Invalid email response format:", response);
+          setEmails([]);
+          setFilteredEmails([]);
         }
+
+        if (!ragIndexInFlight.current) {
+          ragIndexInFlight.current = true;
+          mailAPI
+            .ragIndex(userId)
+            .catch((e) => console.warn("ragIndex failed", e))
+            .finally(() => {
+              ragIndexInFlight.current = false;
+            });
+        }
+        
       } catch (err) {
         console.error("Failed to fetch emails:", err);
       } finally {
         setLoading(false);
       }
     },
-    [emails]
+    []
   );
 
   const fetchEmail = useCallback(

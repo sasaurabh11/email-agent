@@ -25,6 +25,12 @@ const Summaries = () => {
   const [generatedDraft, setGeneratedDraft] = useState('');
   const [copied, setCopied] = useState(false);
 
+    const { fetchEmails } = useEmail();
+
+  useEffect(() => {
+    if (user) fetchEmails(user.id, true);
+  }, [user, fetchEmails]);
+
   useEffect(() => {
     if (user) {
       setLoading(true);
@@ -166,8 +172,8 @@ const Summaries = () => {
               <span className="text-sm text-gray-400">{emails.length} total</span>
             </CardHeader>
             <CardContent>
-              <div className="space-y-2 max-h-96 overflow-y-auto scrollbar-hide">
-                {emails.slice(0, 10).map((email) => (
+              <div className="space-y-2 max-h-96 overflow-y-auto scrollbar-custom">
+                {emails.map((email) => (
                   <div
                     key={email.id}
                     onClick={() => handleEmailSummary(email)}
@@ -203,8 +209,8 @@ const Summaries = () => {
               <span className="text-sm text-gray-400">{getUniqueThreads().length} total</span>
             </CardHeader>
             <CardContent>
-              <div className="space-y-2 max-h-96 overflow-y-auto scrollbar-hide">
-                {getUniqueThreads().slice(0, 10).map((thread) => (
+              <div className="space-y-2 max-h-96 overflow-y-auto scrollbar-custom">
+                {getUniqueThreads().map((thread) => (
                   <div
                     key={thread.thread_id}
                     onClick={() => handleThreadSummary(thread.thread_id)}

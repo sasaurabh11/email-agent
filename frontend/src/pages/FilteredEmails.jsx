@@ -10,6 +10,12 @@ const FilteredEmailsPage = () => {
   const [grouped, setGrouped] = useState({});
   const [isFiltering, setIsFiltering] = useState(false);
 
+  const { fetchEmails } = useEmail();
+
+  useEffect(() => {
+    if (user) fetchEmails(user.id, true);
+  }, [user, fetchEmails]);
+
   useEffect(() => {
     if (emails.length > 0) {
       const groupedData = emails.reduce((acc, email) => {

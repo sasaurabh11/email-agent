@@ -146,6 +146,33 @@ body::before {
   scrollbar-width: none;     /* Firefox */
 }
 
+.scrollbar-custom::-webkit-scrollbar {
+  width: 10px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 10px;
+  margin: 4px 0;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--primary) 40%, transparent);
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--primary) 60%, transparent);
+}
+
+/* Firefox support */
+.scrollbar-custom {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--primary) 40%, transparent) transparent;
+}
+
 .nice-scrollbar::-webkit-scrollbar {
   width: 10px;
   height: 10px;

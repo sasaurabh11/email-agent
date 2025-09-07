@@ -1,6 +1,6 @@
 import React from "react";
 import { useAuth } from "../context/AuthContext";
-import { Mail, Shield, Sparkles, LogIn, LogOut, User, ChevronRight, CheckCircle } from "lucide-react";
+import { Mail, Shield, Sparkles, LogIn, LogOut, User, ChevronRight, CheckCircle, AlertTriangle, Info } from "lucide-react";
 
 const Login = () => {
   const { login, isAuthenticated, user, logout } = useAuth();
@@ -10,6 +10,32 @@ const Login = () => {
       <div className="w-full max-w-md">
         {!isAuthenticated ? (
           <div className="glass border-gray-700 rounded-2xl p-8 shadow-2xl">
+            {/* Warning Section for Unverified App */}
+            <div className="bg-amber-900/30 border border-amber-700 rounded-xl p-4 mb-6">
+              <div className="flex items-start mb-3">
+                <AlertTriangle className="w-5 h-5 text-amber-400 mt-0.5 mr-2 flex-shrink-0" />
+                <h2 className="text-amber-300 font-bold">Important Notice:</h2>
+              </div>
+              <div className="text-amber-100 text-sm space-y-2">
+                <p>This app is currently unverified by Google. To proceed:</p>
+                <ol className="list-decimal pl-5 space-y-1">
+                  <li>Click "Sign in with Google" below</li>
+                  <li>You'll see a warning screen - click <span className="font-semibold">"Advanced"</span></li>
+                  <li>Select <span className="font-semibold">"Go to email-agent-3k9o.onrender.com"</span></li>
+                  <li>On the next screen, you <span className="font-semibold underline">must enable both permissions</span>:
+                    <ul className="list-disc pl-5 mt-1">
+                      <li>View your email messages and settings</li>
+                      <li>View and edit events on all your calendars</li>
+                    </ul>
+                  </li>
+                </ol>
+                <div className="flex items-start mt-2">
+                  <Info className="w-4 h-4 text-amber-400 mt-0.5 mr-2 flex-shrink-0" />
+                  <p className="text-xs">These permissions are required for the app to function properly.</p>
+                </div>
+              </div>
+            </div>
+
             {/* Header */}
             <div className="text-center mb-8">
               <div className="flex justify-center mb-4">
