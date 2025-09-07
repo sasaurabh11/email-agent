@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { 
@@ -23,6 +23,21 @@ const Header = ({ onToggleSidebar, isSidebarOpen }) => {
   const [darkMode, setDarkMode] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
+  useEffect(() => {
+    const root = document.documentElement;
+    const saved = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const enableDark = saved ? saved === 'dark' : prefersDark;
+    setDarkMode(enableDark);
+    root.classList.toggle('dark', enableDark);
+  }, []);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.toggle('dark', darkMode);
+    localStorage.setItem('theme', darkMode ? 'dark' : 'light');
+  }, [darkMode]);
+
   const navigation = [
     { name: 'Dashboard', href: '/', icon: BarChart3 },
     { name: 'Emails', href: '/emails', icon: Mail },
@@ -42,7 +57,7 @@ const Header = ({ onToggleSidebar, isSidebarOpen }) => {
   };
 
   return (
-    <header className="glass border-b border-gray-700 sticky top-0 z-40">
+    <header className="glass border-b border-subtle sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Left side */}
@@ -94,8 +109,8 @@ const Header = ({ onToggleSidebar, isSidebarOpen }) => {
               </button>
 
               {isProfileOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg py-1 z-50 border border-gray-700">
-                  <div className="px-4 py-2 border-b border-gray-700">
+                <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg py-1 z-50 border border-subtle">
+                  <div className="px-4 py-2 border-b border-subtle">
                     <p className="text-sm font-medium text-white">{user?.email}</p>
                   </div>
                   <button

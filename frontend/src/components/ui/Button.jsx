@@ -6,15 +6,18 @@ const Button = ({
   size = 'md', 
   className = '', 
   disabled = false,
+  fullWidth = false,
   ...props 
 }) => {
-  const baseClasses = 'inline-flex items-center justify-center rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none';
+  const baseClasses = 'inline-flex items-center justify-center rounded-xl font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none hover-float focus-glow';
   
   const variants = {
-    primary: 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:from-indigo-600 hover:to-purple-600 focus:ring-indigo-500 shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50',
+    primary: 'btn-primary',
     secondary: 'bg-gray-700 text-gray-200 hover:bg-gray-600 focus:ring-gray-500',
     outline: 'border border-gray-600 bg-transparent text-gray-300 hover:bg-gray-700/50 focus:ring-gray-500',
     ghost: 'bg-transparent hover:bg-gray-700/50 focus:ring-gray-500 text-gray-300',
+    subtle: 'bg-white/5 text-gray-200 hover:bg-white/10 border border-subtle',
+    danger: 'bg-red-600 text-white hover:bg-red-500 focus:ring-red-500',
   };
   
   const sizes = {
@@ -23,7 +26,9 @@ const Button = ({
     lg: 'px-6 py-3 text-base',
   };
 
-  const classes = `${baseClasses} ${variants[variant]} ${sizes[size]} ${className}`;
+  const width = fullWidth ? 'w-full' : '';
+
+  const classes = `${baseClasses} ${variants[variant]} ${sizes[size]} ${width} ${className}`;
 
   return (
     <button className={classes} disabled={disabled} {...props}>

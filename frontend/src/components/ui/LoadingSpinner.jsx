@@ -18,22 +18,13 @@ const LoadingSpinner = ({
     success: 'border-green-500',
     warning: 'border-yellow-500',
     danger: 'border-red-500',
-    light: 'border-white',
-    gradient: 'border-gradient-to-r from-indigo-500 to-purple-500'
-  };
-
-  const gradientVariants = {
-    gradient: (
-      <div className={`animate-spin rounded-full ${sizeClasses[size]} ${className}`}>
-        <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-indigo-500 border-r-purple-500 border-b-pink-500 border-l-blue-500 animate-pulse"></div>
-      </div>
-    )
+    light: 'border-white'
   };
 
   if (variant === 'gradient') {
     return (
-      <div className="flex justify-center items-center">
-        {gradientVariants.gradient}
+      <div className={`animate-spin rounded-full ${sizeClasses[size]} ${className}`}>
+        <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-indigo-500 border-r-purple-500 border-b-pink-500 border-l-blue-500"></div>
       </div>
     );
   }
@@ -51,7 +42,6 @@ const LoadingSpinner = ({
   );
 };
 
-// Optional: Spinner with text component
 export const LoadingSpinnerWithText = ({ 
   text = 'Loading...', 
   size = 'md',
@@ -67,7 +57,6 @@ export const LoadingSpinnerWithText = ({
   );
 };
 
-// Optional: Dots loader variant
 export const DotsLoader = ({ 
   size = 'md',
   variant = 'primary',
@@ -96,7 +85,6 @@ export const DotsLoader = ({
   );
 };
 
-// Optional: Skeleton loader for content
 export const SkeletonLoader = ({ 
   className = '',
   lines = 1 

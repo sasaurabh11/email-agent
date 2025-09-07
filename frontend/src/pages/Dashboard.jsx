@@ -110,7 +110,7 @@ const Dashboard = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-white">AI Email Assistant</h1>
+          <h1 className="text-3xl font-bold text-white text-balance">AI Email Assistant</h1>
           <p className="text-gray-400 mt-1">
             Your intelligent email management dashboard
           </p>
@@ -119,7 +119,7 @@ const Dashboard = () => {
           onClick={() => fetchEmails(user.id)}
           variant="outline"
           size="sm"
-          className="glass border-gray-700 hover:bg-gray-800"
+          className="glass border-subtle hover:bg-gray-800"
         >
           <RefreshCw className="w-4 h-4 mr-2" />
           Refresh
@@ -128,7 +128,7 @@ const Dashboard = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="glass border-gray-700 hover:shadow-lg hover:shadow-indigo-500/10 transition-all">
+        <Card className="hover-float transition-all">
           <CardContent className="p-6">
             <div className="flex items-center">
               <div className="p-3 rounded-full bg-indigo-500/20">
@@ -146,7 +146,7 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
-        <Card className="glass border-gray-700 hover:shadow-lg hover:shadow-green-500/10 transition-all">
+        <Card className="hover-float transition-all">
           <CardContent className="p-6">
             <div className="flex items-center">
               <div className="p-3 rounded-full bg-green-500/20">
@@ -173,7 +173,7 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
-        <Card className="glass border-gray-700 hover:shadow-lg hover:shadow-purple-500/10 transition-all">
+        <Card className="hover-float transition-all">
           <CardContent className="p-6">
             <div className="flex items-center">
               <div className="p-3 rounded-full bg-purple-500/20">
@@ -191,7 +191,7 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
-        <Card className="glass border-gray-700 hover:shadow-lg hover:shadow-orange-500/10 transition-all">
+        <Card className="hover-float transition-all">
           <CardContent className="p-6">
             <div className="flex items-center">
               <div className="p-3 rounded-full bg-orange-500/20">
@@ -213,8 +213,8 @@ const Dashboard = () => {
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Email Classification Overview */}
-        <Card className="glass border-gray-700">
-          <CardHeader className="border-gray-700">
+        <Card>
+          <CardHeader className="border-subtle">
             <h2 className="text-lg font-semibold text-white flex items-center">
               <PieChart className="w-5 h-5 mr-2 text-indigo-400" />
               Email Classification
@@ -260,8 +260,8 @@ const Dashboard = () => {
         </Card>
 
         {/* AI Agent Quick Actions */}
-        <Card className="glass border-gray-700">
-          <CardHeader className="border-gray-700">
+        <Card>
+          <CardHeader className="border-subtle">
             <h2 className="text-lg font-semibold text-white flex items-center">
               <Zap className="w-5 h-5 mr-2 text-yellow-400" />
               AI Agent Actions
@@ -272,7 +272,7 @@ const Dashboard = () => {
               <Button
                 onClick={() => handleQuickAction("filter")}
                 variant="outline"
-                className="w-full justify-start glass border-gray-700 hover:bg-gray-800 text-gray-300"
+                className="w-full justify-start glass border-subtle hover:bg-gray-800 text-gray-300"
                 disabled={loading}
               >
                 <Brain className="w-4 h-4 mr-2 text-indigo-400" />
@@ -282,7 +282,7 @@ const Dashboard = () => {
               <Button
                 onClick={() => handleQuickAction("summaries")}
                 variant="outline"
-                className="w-full justify-start glass border-gray-700 hover:bg-gray-800 text-gray-300"
+                className="w-full justify-start glass border-subtle hover:bg-gray-800 text-gray-300"
               >
                 <FileText className="w-4 h-4 mr-2 text-purple-400" />
                 Generate Summaries
@@ -291,7 +291,7 @@ const Dashboard = () => {
               <Button
                 onClick={() => handleQuickAction("search")}
                 variant="outline"
-                className="w-full justify-start glass border-gray-700 hover:bg-gray-800 text-gray-300"
+                className="w-full justify-start glass border-subtle hover:bg-gray-800 text-gray-300"
               >
                 <Search className="w-4 h-4 mr-2 text-blue-400" />
                 AI Search Emails
@@ -300,7 +300,7 @@ const Dashboard = () => {
               <Button
                 onClick={() => handleQuickAction("agent")}
                 variant="outline"
-                className="w-full justify-start glass border-gray-700 hover:bg-gray-800 text-gray-300"
+                className="w-full justify-start glass border-subtle hover:bg-gray-800 text-gray-300"
               >
                 <Sparkles className="w-4 h-4 mr-2 text-pink-400" />
                 Run AI Agent
@@ -311,8 +311,8 @@ const Dashboard = () => {
         </Card>
 
         {/* Recent AI Activity */}
-        <Card className="glass border-gray-700">
-          <CardHeader className="border-gray-700">
+        <Card>
+          <CardHeader className="border-subtle">
             <h2 className="text-lg font-semibold text-white flex items-center">
               <Activity className="w-5 h-5 mr-2 text-green-400" />
               Recent AI Activity
@@ -328,7 +328,7 @@ const Dashboard = () => {
                 {recentActivity.map((email) => (
                   <div
                     key={email.id}
-                    className="flex items-center justify-between p-3 border border-gray-700 rounded-lg hover:bg-gray-800/50 transition-colors"
+                    className="flex items-center justify-between p-3 border border-subtle rounded-lg hover:bg-gray-800/50 transition-colors"
                   >
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-white truncate">
@@ -357,8 +357,8 @@ const Dashboard = () => {
       </div>
 
       {/* Quick Access to Main Features */}
-      <Card className="glass border-gray-700">
-        <CardHeader className="border-gray-700">
+      <Card>
+        <CardHeader className="border-subtle">
           <h2 className="text-lg font-semibold text-white">Quick Access</h2>
         </CardHeader>
         <CardContent>
@@ -366,7 +366,7 @@ const Dashboard = () => {
             <Button
               onClick={() => navigate("/emails")}
               variant="outline"
-              className="h-20 flex-col glass border-gray-700 hover:bg-gray-800 text-gray-300"
+              className="h-20 flex-col glass border-subtle hover:bg-gray-800 text-gray-300"
             >
               <Mail className="w-6 h-6 mb-2 text-indigo-400" />
               <span>Email Inbox</span>
@@ -374,7 +374,7 @@ const Dashboard = () => {
             <Button
               onClick={() => navigate("/summaries")}
               variant="outline"
-              className="h-20 flex-col glass border-gray-700 hover:bg-gray-800 text-gray-300"
+              className="h-20 flex-col glass border-subtle hover:bg-gray-800 text-gray-300"
             >
               <FileText className="w-6 h-6 mb-2 text-purple-400" />
               <span>Summaries</span>
@@ -382,7 +382,7 @@ const Dashboard = () => {
             <Button
               onClick={() => navigate("/filter")}
               variant="outline"
-              className="h-20 flex-col glass border-gray-700 hover:bg-gray-800 text-gray-300"
+              className="h-20 flex-col glass border-subtle hover:bg-gray-800 text-gray-300"
             >
               <Filter className="w-6 h-6 mb-2 text-blue-400" />
               <span>Filtered Emails</span>

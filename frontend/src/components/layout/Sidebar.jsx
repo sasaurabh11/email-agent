@@ -45,12 +45,12 @@ const Sidebar = ({ isOpen, onClose }) => {
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 bg-gray-900 border-r border-gray-800 shadow-2xl transform transition-all duration-300 ease-in-out lg:static lg:translate-x-0 flex flex-col ${
+        className={`fixed inset-y-0 left-0 z-50 glass border border-subtle shadow-2xl transform transition-all duration-300 ease-in-out lg:static lg:translate-x-0 flex flex-col ${
           isOpen ? 'translate-x-0 w-64' : '-translate-x-full lg:translate-x-0 lg:w-20'
         } ${isCollapsed ? 'lg:w-20' : 'lg:w-64'}`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between h-16 px-4 border-b border-gray-800">
+        <div className="flex items-center justify-between h-16 px-4 border-b border-subtle">
           {(!isCollapsed || isOpen) && (
             <div className="flex items-center">
               <div className="relative">
@@ -79,7 +79,7 @@ const Sidebar = ({ isOpen, onClose }) => {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-4 py-6 space-y-8 overflow-y-auto">
+        <nav className="flex-1 px-4 py-6 space-y-8 overflow-y-auto nice-scrollbar">
           <div>
             <h3 className={`px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider ${(isCollapsed && !isOpen) && 'lg:hidden'}`}>
               Navigation
@@ -93,7 +93,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                     key={item.name}
                     to={item.href}
                     onClick={onClose}
-                    className={`flex items-center px-3 py-3 text-sm font-medium rounded-md transition-all ${
+                    className={`flex items-center px-3 py-3 text-sm font-medium rounded-md transition-all hover-float ${
                       active
                         ? 'text-white bg-indigo-900 shadow-lg'
                         : 'text-gray-400 hover:text-white hover:bg-gray-800'
@@ -122,7 +122,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                     key={item.name}
                     to={item.href}
                     onClick={onClose}
-                    className="flex items-center px-3 py-3 text-sm rounded-md bg-gray-800 hover:bg-gray-750 transition-colors group"
+                    className="flex items-center px-3 py-3 text-sm rounded-md bg-gray-800/60 hover:bg-gray-800 transition-colors group border border-subtle"
                   >
                     <div className="p-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-md">
                       <Icon className="w-4 h-4 text-white" />
@@ -141,7 +141,7 @@ const Sidebar = ({ isOpen, onClose }) => {
         </nav>
 
         {/* Footer */}
-        <div className={`px-4 py-4 border-t border-gray-800 ${(isCollapsed && !isOpen) && 'lg:hidden'}`}>
+        <div className={`px-4 py-4 border-t border-subtle ${(isCollapsed && !isOpen) && 'lg:hidden'}`}>
           <div className="flex items-center">
             <div className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
               <Sparkles className="w-5 h-5 text-white" />

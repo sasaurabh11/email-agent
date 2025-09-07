@@ -3,7 +3,7 @@ import React from 'react';
 const Card = ({ children, className = '', ...props }) => {
   return (
     <div 
-      className={`bg-gray-800/50 rounded-xl shadow-lg border border-gray-700 backdrop-blur-sm ${className}`}
+      className={`glass border border-subtle card-elevated ${className}`}
       {...props}
     >
       {children}
@@ -13,7 +13,7 @@ const Card = ({ children, className = '', ...props }) => {
 
 const CardHeader = ({ children, className = '' }) => {
   return (
-    <div className={`px-6 py-4 border-b border-gray-700 ${className}`}>
+    <div className={`px-6 py-4 border-b border-subtle ${className}`}>
       {children}
     </div>
   );
@@ -29,7 +29,7 @@ const CardContent = ({ children, className = '' }) => {
 
 const CardFooter = ({ children, className = '' }) => {
   return (
-    <div className={`px-6 py-4 border-t border-gray-700 ${className}`}>
+    <div className={`px-6 py-4 border-t border-subtle ${className}`}>
       {children}
     </div>
   );
