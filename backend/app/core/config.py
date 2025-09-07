@@ -37,8 +37,8 @@ class Settings(BaseSettings):
         "https://www.googleapis.com/auth/userinfo.profile",
         "openid"
     ]
-    FRONTEND_URL: str = "http://localhost:5173"
-    REDIRECT_URL: str = "http://localhost:8000/emails/auth/callback"
+    FRONTEND_URL: str = "https://email-agent-black.vercel.app"
+    REDIRECT_URL: str = "https://email-agent-3k9o.onrender.com/emails/auth/callback"
     
 
     CAL_COM_API_KEY: str = ""
