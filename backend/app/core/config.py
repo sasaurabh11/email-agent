@@ -2,6 +2,7 @@ from pydantic_settings import BaseSettings
 from pydantic import Field
 from typing import List
 import os
+from typing import ClassVar
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -31,7 +32,10 @@ class Settings(BaseSettings):
     GOOGLE_CLIENT_ID: str = ""
     GOOGLE_CLIENT_SECRET: str = ""
 
-    CLIENT_SECRETS_FILE = os.path.join(BASE_DIR, "client_secret.json")
+    CLIENT_SECRETS_FILE: str = Field(
+        default=os.path.join(BASE_DIR, "client_secret.json"),
+        alias="CLIENT_FILE"
+    )
     GMAILSCOPES: List[str] = [
         "https://www.googleapis.com/auth/gmail.readonly",
         "https://www.googleapis.com/auth/calendar.events",
