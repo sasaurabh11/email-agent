@@ -32,10 +32,11 @@ class Settings(BaseSettings):
     GOOGLE_CLIENT_ID: str = ""
     GOOGLE_CLIENT_SECRET: str = ""
 
-    CLIENT_SECRETS_FILE: str = Field(
-        default=os.path.join(BASE_DIR, "client_secret.json"),
-        alias="CLIENT_FILE"
-    )
+    # CLIENT_SECRETS_FILE: str = Field(
+    #     default=os.path.join(BASE_DIR, "client_secret.json"),
+    #     alias="CLIENT_FILE"
+    # )
+    CLIENT_SECRETS_FILE: ClassVar[str] = "/etc/secrets/client_secret.json"
     GMAILSCOPES: List[str] = [
         "https://www.googleapis.com/auth/gmail.readonly",
         "https://www.googleapis.com/auth/calendar.events",
@@ -45,6 +46,8 @@ class Settings(BaseSettings):
     ]
     FRONTEND_URL: str = "https://email-agent-black.vercel.app"
     REDIRECT_URL: str = "https://email-agent-3k9o.onrender.com/emails/auth/callback"
+    # FRONTEND_URL: str = "http://localhost:5173"
+    # REDIRECT_URL: str = "http://localhost:8000/emails/auth/callback"
     
 
     CAL_COM_API_KEY: str = ""
